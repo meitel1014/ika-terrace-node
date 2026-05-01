@@ -512,14 +512,6 @@ export default (nodecg: NodeCG) => {
     if (ack && !ack.handled) ack(null);
   });
 
-  nodecg.listenFor('reloadWeaponAliases', (_data, ack) => {
-    weaponAliasesRep.value = loadWeaponAliasesFromCsv();
-    log.info(
-      `Reloaded weapon aliases: ${Object.keys(weaponAliasesRep.value ?? {}).length} entries`
-    );
-    if (ack && !ack.handled) ack(null);
-  });
-
   nodecg.listenFor('reloadInGameNamesCsv', (_data, ack) => {
     inGameNamesRep.value = loadInGameNamesFromCsv();
     log.info(

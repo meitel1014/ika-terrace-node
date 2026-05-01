@@ -57,13 +57,6 @@
         "width": 4
       },
       {
-        "name": "settings-weapons",
-        "title": "設定｜ブキ対応表",
-        "file": "settings-weapons.html",
-        "workspace": "設定",
-        "width": 4
-      },
-      {
         "name": "settings-google-sheet",
         "title": "設定｜Google スプレッドシート同期",
         "file": "settings-google-sheet.html",
