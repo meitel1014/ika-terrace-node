@@ -10,7 +10,6 @@ function uploadLabel(status: Status): string {
 
 export function CsvReloadPanel() {
   const teams = useReloadButton('reloadTeamsCsv');
-  const inGame = useReloadButton('reloadInGameNamesCsv');
   const [uploadStatus, setUploadStatus] = useState<Status>('idle');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -71,16 +70,6 @@ export function CsvReloadPanel() {
         </button>
       </div>
 
-      <p style={{ marginTop: '16px' }}>
-        <code>data/in-game-name.csv</code> からゲーム内名前対応表を再読み込みします。
-      </p>
-      <button
-        onClick={inGame.handle}
-        disabled={inGame.status === 'loading'}
-        className="btn btn-reload"
-      >
-        {statusLabel(inGame.status, 'ゲーム内表記CSV再読込')}
-      </button>
     </div>
   );
 }

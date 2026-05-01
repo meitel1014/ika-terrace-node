@@ -48,10 +48,6 @@ export type MessageMap = {
     data: { mode: Mode; candidateIndex: number; stageName: string };
   };
 
-  /** data/in-game-name.csv を再読込して inGameNames Replicant に反映 */
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- データなし
-  reloadInGameNamesCsv: {};
-
   /** 手動入力用の空の候補をキューに追加する */
   addManualCandidate: { data: { mode: Mode } };
 

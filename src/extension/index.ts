@@ -541,14 +541,6 @@ export default (nodecg: NodeCG) => {
     if (ack && !ack.handled) ack(null);
   });
 
-  nodecg.listenFor('reloadInGameNamesCsv', (_data, ack) => {
-    inGameNamesRep.value = loadInGameNamesFromCsv();
-    log.info(
-      `Reloaded in-game names: ${Object.keys(inGameNamesRep.value ?? {}).length} entries`
-    );
-    if (ack && !ack.handled) ack(null);
-  });
-
   nodecg.listenFor('setInGameName', ({ playerName, inGameName }, ack) => {
     inGameNamesRep.value = { ...(inGameNamesRep.value ?? {}), [playerName]: inGameName };
     if (ack && !ack.handled) ack(null);
