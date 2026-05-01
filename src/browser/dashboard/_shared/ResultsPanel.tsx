@@ -132,7 +132,7 @@ export function ResultsPanel({ mode }: Props) {
                   <h3><span>ブラボー | <Html value={waitingBravoTeam?.name ?? '(未選択)'} /></span></h3>
                 </div>
               </div>
-              <p>両チームが表示状態の時、試合開始時自動的にマップ画面を読み取ります。</p>
+              <p>試合開始時自動的にマップ画面を読み取ります。</p>
               <p className="results-drop-hint">
                 {isDragging ? 'ここにドロップ' : '送信されなかった場合、 PNG をここにドロップ'}
               </p>

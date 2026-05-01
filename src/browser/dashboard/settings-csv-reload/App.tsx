@@ -42,8 +42,7 @@ export function CsvReloadPanel() {
   return (
     <div className="csv-reload-panel">
       <p>
-        <code>data/teams.csv</code> からチーム情報を再読み込みします。
-        <br />
+        チーム情報を再読み込みします。
         編集内容はすべて破棄されます。
       </p>
       <div style={{ display: 'flex', gap: '8px' }}>
