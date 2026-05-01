@@ -126,10 +126,10 @@ export function ResultsPanel({ mode }: Props) {
             <>
               <div className="results-grid results-waiting-teams">
                 <div className="results-column results-alpha">
-                  <h3><span>アルファ | <Html value={waitingAlphaTeam?.id ?? '(未選択)'} /></span></h3>
+                  <h3><span>アルファ | <Html value={waitingAlphaTeam?.name ?? '(未選択)'} /></span></h3>
                 </div>
                 <div className="results-column results-bravo">
-                  <h3><span>ブラボー | <Html value={waitingBravoTeam?.id ?? '(未選択)'} /></span></h3>
+                  <h3><span>ブラボー | <Html value={waitingBravoTeam?.name ?? '(未選択)'} /></span></h3>
                 </div>
               </div>
               <p>両チームが表示状態の時、試合開始時自動的にマップ画面を読み取ります。</p>
@@ -194,7 +194,7 @@ export function ResultsPanel({ mode }: Props) {
         ) : (
           <ul>
             {recentMatches.map((m) => (
-              <HistoryItem key={m.id} match={m} aliases={aliases} />
+              <HistoryItem key={m.id} match={m} aliases={aliases} teamsPool={teamsPool} />
             ))}
           </ul>
         )}
@@ -371,7 +371,7 @@ function CandidateEditor({
                 onAnimationEnd={(e) => { if (e.currentTarget === e.target) setWonSideFlash(null); }}
               >
                 <div className="results-side-header-inner">
-                  <span>アルファ | <Html value={alphaTeam?.id ?? '(未選択)'} /></span>
+                  <span>アルファ | <Html value={alphaTeam?.name ?? '(未選択)'} /></span>
                   <button
                     className={`btn-sm btn-winner btn-winner--alpha${cand.wonSide === 'alpha' ? ' btn-winner--selected' : ''}`}
                     onClick={() => handleWonSideChange('alpha')}
@@ -387,7 +387,7 @@ function CandidateEditor({
                 onAnimationEnd={(e) => { if (e.currentTarget === e.target) setWonSideFlash(null); }}
               >
                 <div className="results-side-header-inner">
-                  <span>ブラボー | <Html value={bravoTeam?.id ?? '(未選択)'} /></span>
+                  <span>ブラボー | <Html value={bravoTeam?.name ?? '(未選択)'} /></span>
                   <button
                     className={`btn-sm btn-winner btn-winner--bravo${cand.wonSide === 'bravo' ? ' btn-winner--selected' : ''}`}
                     onClick={() => handleWonSideChange('bravo')}
@@ -604,12 +604,14 @@ function CandidateEditor({
 type HistoryItemProps = {
   match: Match;
   aliases: WeaponAliases | undefined;
+  teamsPool: TeamsPool;
 };
 
-function HistoryItem({ match, aliases }: HistoryItemProps) {
+function HistoryItem({ match, aliases, teamsPool }: HistoryItemProps) {
   const [open, setOpen] = useState(false);
-  const alphaName = match.alpha.teamId;
-  const bravoName = match.bravo.teamId;
+  const pool = teamsPool[match.mode];
+  const alphaName = pool.find((t) => t.id === match.alpha.teamId)?.name ?? match.alpha.teamId;
+  const bravoName = pool.find((t) => t.id === match.bravo.teamId)?.name ?? match.bravo.teamId;
 
   const handleDelete = () => {
     if (!confirm('この試合記録を削除しますか？')) return;

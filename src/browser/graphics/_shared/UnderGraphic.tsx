@@ -22,7 +22,7 @@ function TeamSlot({ mode, side }: { mode: Mode; side: Side }) {
     <div className={`under-slot under-${side}`} style={fadeStyle}>
       {team && (
         <>
-          <div className="under-team-name">{team.id}</div>
+          <div className="under-team-name">{team.name}</div>
           <div className="under-players">
             {team.players.join('\u3000')}
           </div>

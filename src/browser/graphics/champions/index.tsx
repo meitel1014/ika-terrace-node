@@ -17,14 +17,14 @@ function TeamNames({ mode }: { mode: Mode }) {
     <div className="champ-team-names">
       <div className="champ-team-name-wrapper team-alpha" style={alphaFade}>
         <FitText
-          html={alpha.team?.name ?? ''}
+          html={alpha.team?.viewname ?? ''}
           align="left"
           className="champ-team-name"
         />
       </div>
       <div className="champ-team-name-wrapper team-bravo" style={bravoFade}>
         <FitText
-          html={bravo.team?.name ?? ''}
+          html={bravo.team?.viewname ?? ''}
           align="left"
           className="champ-team-name"
         />
