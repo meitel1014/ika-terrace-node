@@ -7,15 +7,34 @@
 /* ── フラッシュアニメーション ── */
 
 @keyframes flash-weapons-once {
-  0%   { background-color: transparent; box-shadow: none; }
-  50%  { background-color: rgba(255, 220, 60, 0.15); box-shadow: 0 0 0 2px rgba(255, 220, 60, 0.5); }
-  100% { background-color: transparent; box-shadow: none; }
+  0% {
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  50% {
+    background-color: rgba(255, 220, 60, 0.15);
+    box-shadow: 0 0 0 2px rgba(255, 220, 60, 0.5);
+  }
+
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
 }
 
 @keyframes flash-winner-blink {
-  0%   { background-color: transparent; }
-  50%  { background-color: var(--flash-bg); }
-  100% { background-color: transparent; }
+  0% {
+    background-color: transparent;
+  }
+
+  50% {
+    background-color: var(--flash-bg);
+  }
+
+  100% {
+    background-color: transparent;
+  }
 }
 
 .flash-weapons {
@@ -159,8 +178,15 @@
   color: var(--text);
 }
 
-.tag-alpha { border-color: var(--accent-alpha); color: var(--accent-alpha); }
-.tag-bravo { border-color: var(--accent-bravo); color: var(--accent-bravo); }
+.tag-alpha {
+  border-color: var(--accent-alpha);
+  color: var(--accent-alpha);
+}
+
+.tag-bravo {
+  border-color: var(--accent-bravo);
+  color: var(--accent-bravo);
+}
 
 .results-editor {
   display: flex;
@@ -250,6 +276,7 @@
   align-items: center;
   gap: 8px;
   font-size: 14px;
+  min-height: 60px;
 }
 
 .results-stage-label {
@@ -296,7 +323,8 @@
   vertical-align: top;
   padding: 6px 0;
   border-bottom: 2px solid var(--border);
-  width: 50%; /* 各サイドを左右半々に固定 */
+  width: 50%;
+  /* 各サイドを左右半々に固定 */
 }
 
 /* 元の h3 の flex レイアウト（チーム名左寄せ・勝利ボタン右寄せ）を再現 */
@@ -431,6 +459,7 @@ button.btn-manual {
   background: transparent;
   margin-top: 10px;
 }
+
 button.btn-manual:hover {
   border-color: var(--text);
   color: var(--text);
@@ -500,11 +529,29 @@ button.btn-dismiss:hover {
   text-align: left;
 }
 
-.history-head:hover { background: #1e2d4a; }
-.history-time { color: var(--text-muted); font-variant-numeric: tabular-nums; }
-.history-teams { overflow: hidden; text-overflow: ellipsis; }
-.vs { color: var(--text-muted); margin: 0 4px; }
-.history-toggle { color: var(--text-muted); font-size: 12px; }
+.history-head:hover {
+  background: #1e2d4a;
+}
+
+.history-time {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.history-teams {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vs {
+  color: var(--text-muted);
+  margin: 0 4px;
+}
+
+.history-toggle {
+  color: var(--text-muted);
+  font-size: 12px;
+}
 
 .history-detail {
   display: grid;
@@ -515,7 +562,7 @@ button.btn-dismiss:hover {
   font-size: 14px;
 }
 
-.history-detail > button {
+.history-detail>button {
   grid-column: 1 / -1;
   justify-self: end;
 }
