@@ -253,11 +253,14 @@ function CandidateEditor({
     prevWonSideRef.current = cand.wonSide;
   }, [cand.wonSide]);
 
-  // ステージフラッシュ: stageName が null→値 に変化したとき（/stage 後付け反映）
+  // ステージフラッシュ: /stage 自動入力時のみ点灯（手動選択時はスキップ）
   const [stageFlash, setStageFlash] = useState(false);
   const prevStageNameRef = useRef<string | null | undefined>(undefined);
+  const manualStageRef = useRef(false);
   useEffect(() => {
-    if (
+    if (manualStageRef.current) {
+      manualStageRef.current = false;
+    } else if (
       prevStageNameRef.current !== undefined &&
       cand.stageName !== prevStageNameRef.current &&
       cand.stageName !== null
@@ -306,6 +309,7 @@ function CandidateEditor({
     });
   };
   const handleStageChange = (stageName: string) => {
+    manualStageRef.current = true;
     void nodecg.sendMessage('setMatchCandidateStageName', { mode, candidateIndex, stageName });
   };
   const handleWeaponChange = (side: Side, position: PickPosition, weaponId: string) => {
@@ -316,123 +320,6 @@ function CandidateEditor({
       position,
       patch: { weaponId },
     });
-  };
-
-  const renderSide = (side: Side) => {
-    const team = side === 'alpha' ? alphaTeam : bravoTeam;
-    const sideCand = cand[side];
-    const playerOptions = team?.players ?? (['', '', '', ''] as const);
-
-    return (
-      <div
-        className={`results-column results-${side}${wonSideFlash === side ? ` flash-winner-${side}` : ''}`}
-        onAnimationEnd={(e) => { if (e.currentTarget === e.target) setWonSideFlash(null); }}
-      >
-        <h3>
-          <span>
-            {side === 'alpha' ? 'アルファ' : 'ブラボー'} |{' '}
-            <Html value={team?.id ?? '(未選択)'} />
-          </span>
-          <button
-            className={`btn-sm btn-winner btn-winner--${side}${cand.wonSide === side ? ' btn-winner--selected' : ''}`}
-            onClick={() => handleWonSideChange(side)}
-          >
-            勝利
-          </button>
-        </h3>
-        <table className="results-table">
-          <thead>
-            <tr>
-              <th></th>
-              <th>プレイヤー</th>
-              <th>ブキ</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sideCand.picks.map((pick) => {
-              const key = `${candidateIndex}-${side}-${pick.position}`;
-              const showAll = showAllWeapons[key] ?? false;
-              const weaponOptions = (showAll || pick.weaponCandidates.length === 0) && fullWeaponList.length > 0
-                ? fullWeaponList
-                : pick.weaponCandidates.slice(0, TOP_N_WEAPONS);
-
-              return (
-                <tr key={pick.position}>
-                  <th>{pick.position + 1}</th>
-                  <td>
-                    {pick.nameImageDataUrl && (
-                      <img className="name-region-img" src={pick.nameImageDataUrl} alt="" />
-                    )}
-                    <select
-                      value={pick.selected.playerName}
-                      onChange={(e) =>
-                        handlePlayerChange(side, pick.position, e.target.value)
-                      }
-                    >
-                      {pick.selected.playerName &&
-                      !playerOptions.includes(pick.selected.playerName) ? (
-                        <option value={pick.selected.playerName}>
-                          {pick.selected.playerName}（候補外）
-                        </option>
-                      ) : null}
-                      {playerOptions.map((name, i) => (
-                        <option key={i} value={name}>
-                          {stripHtml(name) || '(空欄)'}
-                        </option>
-                      ))}
-                    </select>
-                    {pick.selected.playerName && !cand.isManual ? (
-                      <span className="player-ingame-name">
-                        {inGameNames?.[pick.selected.playerName] ?? pick.selected.playerName}
-                      </span>
-                    ) : null}
-                  </td>
-                  <td>
-                    {pick.weaponImageDataUrl && (
-                      <img className="weapon-region-img" src={pick.weaponImageDataUrl} alt="" />
-                    )}
-                    <select
-                      value={pick.selected.weaponId}
-                      onChange={(e) =>
-                        handleWeaponChange(side, pick.position, e.target.value)
-                      }
-                    >
-                      {cand.isManual && <option value="">(未選択)</option>}
-                      {pick.selected.weaponId &&
-                      !weaponOptions.includes(pick.selected.weaponId) ? (
-                        <option value={pick.selected.weaponId}>
-                          {weaponLabel(pick.selected.weaponId, aliases)}
-                        </option>
-                      ) : null}
-                      {weaponOptions.map((wid) => (
-                        <option key={wid} value={wid}>
-                          {weaponLabel(wid, aliases)}
-                        </option>
-                      ))}
-                    </select>
-                    {!cand.isManual && (
-                      <label className="weapon-toggle">
-                        <input
-                          type="checkbox"
-                          checked={showAll}
-                          onChange={() =>
-                            setShowAllWeapons((prev) => ({
-                              ...prev,
-                              [key]: !prev[key],
-                            }))
-                          }
-                        />
-                        すべて
-                      </label>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    );
   };
 
   return (
@@ -469,13 +356,220 @@ function CandidateEditor({
           )}
         </div>
       </div>
+
+      {/* アルファ/ブラボーを1つのテーブルに統合してヘッダー行の高さを揃える */}
       <div
-        className={`results-grid${weaponsFlash ? ' flash-weapons' : ''}`}
+        className={`results-table-wrapper${weaponsFlash ? ' flash-weapons' : ''}`}
         onAnimationEnd={(e) => { if (e.currentTarget === e.target) setWeaponsFlash(false); }}
       >
-        {renderSide('alpha')}
-        {renderSide('bravo')}
+        <table className="results-table">
+          <thead>
+            <tr>
+              <th
+                colSpan={3}
+                className={`results-side-header results-alpha-header${wonSideFlash === 'alpha' ? ' flash-winner-alpha' : ''}`}
+                onAnimationEnd={(e) => { if (e.currentTarget === e.target) setWonSideFlash(null); }}
+              >
+                <div className="results-side-header-inner">
+                  <span>アルファ | <Html value={alphaTeam?.id ?? '(未選択)'} /></span>
+                  <button
+                    className={`btn-sm btn-winner btn-winner--alpha${cand.wonSide === 'alpha' ? ' btn-winner--selected' : ''}`}
+                    onClick={() => handleWonSideChange('alpha')}
+                  >
+                    勝利
+                  </button>
+                </div>
+              </th>
+              <th className="results-spacer-col" />
+              <th
+                colSpan={3}
+                className={`results-side-header results-bravo-header${wonSideFlash === 'bravo' ? ' flash-winner-bravo' : ''}`}
+                onAnimationEnd={(e) => { if (e.currentTarget === e.target) setWonSideFlash(null); }}
+              >
+                <div className="results-side-header-inner">
+                  <span>ブラボー | <Html value={bravoTeam?.id ?? '(未選択)'} /></span>
+                  <button
+                    className={`btn-sm btn-winner btn-winner--bravo${cand.wonSide === 'bravo' ? ' btn-winner--selected' : ''}`}
+                    onClick={() => handleWonSideChange('bravo')}
+                  >
+                    勝利
+                  </button>
+                </div>
+              </th>
+            </tr>
+            <tr>
+              <th />
+              <th>プレイヤー</th>
+              <th>ブキ</th>
+              <th className="results-spacer-col" />
+              <th className="results-bravo-pos" />
+              <th>プレイヤー</th>
+              <th>ブキ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cand.alpha.picks.map((alphaPick, i) => {
+              const bravoPick = cand.bravo.picks[i];
+              const alphaPlayerOptions = alphaTeam?.players ?? (['', '', '', ''] as const);
+              const bravoPlayerOptions = bravoTeam?.players ?? (['', '', '', ''] as const);
+              const alphaKey = `${candidateIndex}-alpha-${alphaPick.position}`;
+              const bravoKey = `${candidateIndex}-bravo-${bravoPick.position}`;
+              const alphaShowAll = showAllWeapons[alphaKey] ?? false;
+              const bravoShowAll = showAllWeapons[bravoKey] ?? false;
+              const alphaWeaponOptions =
+                (alphaShowAll || alphaPick.weaponCandidates.length === 0) && fullWeaponList.length > 0
+                  ? fullWeaponList
+                  : alphaPick.weaponCandidates.slice(0, TOP_N_WEAPONS);
+              const bravoWeaponOptions =
+                (bravoShowAll || bravoPick.weaponCandidates.length === 0) && fullWeaponList.length > 0
+                  ? fullWeaponList
+                  : bravoPick.weaponCandidates.slice(0, TOP_N_WEAPONS);
+
+              return (
+                <tr key={alphaPick.position}>
+                  {/* アルファ: 番号 */}
+                  <th>{alphaPick.position + 1}</th>
+
+                  {/* アルファ: プレイヤー */}
+                  <td className="results-alpha-td">
+                    {alphaPick.nameImageDataUrl && (
+                      <img className="name-region-img" src={alphaPick.nameImageDataUrl} alt="" />
+                    )}
+                    <select
+                      value={alphaPick.selected.playerName}
+                      onChange={(e) => handlePlayerChange('alpha', alphaPick.position, e.target.value)}
+                    >
+                      {alphaPick.selected.playerName &&
+                      !alphaPlayerOptions.includes(alphaPick.selected.playerName) ? (
+                        <option value={alphaPick.selected.playerName}>
+                          {alphaPick.selected.playerName}（候補外）
+                        </option>
+                      ) : null}
+                      {alphaPlayerOptions.map((name, j) => (
+                        <option key={j} value={name}>
+                          {stripHtml(name) || '(空欄)'}
+                        </option>
+                      ))}
+                    </select>
+                    {alphaPick.selected.playerName && !cand.isManual ? (
+                      <span className="player-ingame-name">
+                        {inGameNames?.[alphaPick.selected.playerName] ?? alphaPick.selected.playerName}
+                      </span>
+                    ) : null}
+                  </td>
+
+                  {/* アルファ: ブキ */}
+                  <td className="results-alpha-td">
+                    {alphaPick.weaponImageDataUrl && (
+                      <img className="weapon-region-img" src={alphaPick.weaponImageDataUrl} alt="" />
+                    )}
+                    <select
+                      value={alphaPick.selected.weaponId}
+                      onChange={(e) => handleWeaponChange('alpha', alphaPick.position, e.target.value)}
+                    >
+                      {cand.isManual && <option value="">(未選択)</option>}
+                      {alphaPick.selected.weaponId &&
+                      !alphaWeaponOptions.includes(alphaPick.selected.weaponId) ? (
+                        <option value={alphaPick.selected.weaponId}>
+                          {weaponLabel(alphaPick.selected.weaponId, aliases)}
+                        </option>
+                      ) : null}
+                      {alphaWeaponOptions.map((wid) => (
+                        <option key={wid} value={wid}>
+                          {weaponLabel(wid, aliases)}
+                        </option>
+                      ))}
+                    </select>
+                    {!cand.isManual && (
+                      <label className="weapon-toggle">
+                        <input
+                          type="checkbox"
+                          checked={alphaShowAll}
+                          onChange={() =>
+                            setShowAllWeapons((prev) => ({ ...prev, [alphaKey]: !prev[alphaKey] }))
+                          }
+                        />
+                        すべて
+                      </label>
+                    )}
+                  </td>
+
+                  {/* スペーサー */}
+                  <td className="results-spacer-col" />
+
+                  {/* ブラボー: 番号 */}
+                  <th className="results-bravo-pos">{bravoPick.position + 1}</th>
+
+                  {/* ブラボー: プレイヤー */}
+                  <td className="results-bravo-td">
+                    {bravoPick.nameImageDataUrl && (
+                      <img className="name-region-img" src={bravoPick.nameImageDataUrl} alt="" />
+                    )}
+                    <select
+                      value={bravoPick.selected.playerName}
+                      onChange={(e) => handlePlayerChange('bravo', bravoPick.position, e.target.value)}
+                    >
+                      {bravoPick.selected.playerName &&
+                      !bravoPlayerOptions.includes(bravoPick.selected.playerName) ? (
+                        <option value={bravoPick.selected.playerName}>
+                          {bravoPick.selected.playerName}（候補外）
+                        </option>
+                      ) : null}
+                      {bravoPlayerOptions.map((name, j) => (
+                        <option key={j} value={name}>
+                          {stripHtml(name) || '(空欄)'}
+                        </option>
+                      ))}
+                    </select>
+                    {bravoPick.selected.playerName && !cand.isManual ? (
+                      <span className="player-ingame-name">
+                        {inGameNames?.[bravoPick.selected.playerName] ?? bravoPick.selected.playerName}
+                      </span>
+                    ) : null}
+                  </td>
+
+                  {/* ブラボー: ブキ */}
+                  <td className="results-bravo-td">
+                    {bravoPick.weaponImageDataUrl && (
+                      <img className="weapon-region-img" src={bravoPick.weaponImageDataUrl} alt="" />
+                    )}
+                    <select
+                      value={bravoPick.selected.weaponId}
+                      onChange={(e) => handleWeaponChange('bravo', bravoPick.position, e.target.value)}
+                    >
+                      {cand.isManual && <option value="">(未選択)</option>}
+                      {bravoPick.selected.weaponId &&
+                      !bravoWeaponOptions.includes(bravoPick.selected.weaponId) ? (
+                        <option value={bravoPick.selected.weaponId}>
+                          {weaponLabel(bravoPick.selected.weaponId, aliases)}
+                        </option>
+                      ) : null}
+                      {bravoWeaponOptions.map((wid) => (
+                        <option key={wid} value={wid}>
+                          {weaponLabel(wid, aliases)}
+                        </option>
+                      ))}
+                    </select>
+                    {!cand.isManual && (
+                      <label className="weapon-toggle">
+                        <input
+                          type="checkbox"
+                          checked={bravoShowAll}
+                          onChange={() =>
+                            setShowAllWeapons((prev) => ({ ...prev, [bravoKey]: !prev[bravoKey] }))
+                          }
+                        />
+                        すべて
+                      </label>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
+
       <div className="results-actions">
         <button className="btn btn-confirm" onClick={handleConfirm}>
           確定して記録
