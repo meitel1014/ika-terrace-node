@@ -4,7 +4,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import sharp from 'sharp';
 import type { NodeCG } from './nodecg';
-import { loadTeamsPoolFromCsv } from './loadTeams';
+import { loadTeamsPoolFromCsv, parseTeamsPoolFromCsvText } from './loadTeams';
 import { loadWeaponAliasesFromCsv } from './weaponAliases';
 import { loadInGameNamesFromCsv } from './loadInGameNames';
 import { appendRecordCsv, appendRecordGoogleSheet } from './appendRecord';
@@ -309,6 +309,35 @@ export default (nodecg: NodeCG) => {
     } else {
       log.info(`[result] received '${result}' but no candidates in ${mode} queue`);
     }
+  });
+
+  // POST /upload-teams-csv  (body: UTF-8 CSV text, Content-Type: text/plain)
+  nodecg.mount('/upload-teams-csv', (req, res) => {
+    if (req.method !== 'POST') {
+      res.status(405).end();
+      return;
+    }
+
+    const chunks: Buffer[] = [];
+    req.on('data', (chunk: Buffer) => chunks.push(chunk));
+    req.on('end', () => {
+      const csvText = Buffer.concat(chunks).toString('utf-8');
+      if (!csvText.trim()) {
+        res.status(400).json({ error: 'empty body' });
+        return;
+      }
+
+      const loaded = parseTeamsPoolFromCsvText(csvText);
+      teamsPoolRep.value = loaded;
+      log.info(
+        `[upload-teams-csv] turfWar=${loaded.turfWar.length}, splatZones=${loaded.splatZones.length}`
+      );
+      res.status(200).json({ turfWar: loaded.turfWar.length, splatZones: loaded.splatZones.length });
+    });
+
+    req.on('error', (e) => {
+      log.error('[upload-teams-csv] リクエストエラー', e);
+    });
   });
 
   // ── Message ハンドラ ───────────────────────────────────

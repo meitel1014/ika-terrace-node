@@ -27,30 +27,10 @@ function findPlayerColumnIndex(header: string[], playerNum: 0 | 1 | 2 | 3): numb
 }
 
 /**
- * data/teams.csv を読んで TeamsPool を構築する。
- *
- * - `id`      : データ行の上から順の連番文字列 ("1", "2", ...)
- * - `name`    : `チーム名` 列の値（CSV 原本、不変キー）
- * - `viewname`: `チーム名(表示用)` 列の値。列がなければ name と同値
- * - `alias`   : `二つ名` 列の値
- * - `players` : 数字を含む列名で柔軟検出（半角/全角/丸数字に対応）
- *
- * `ルール` 列がない場合は全チームを turfWar と splatZones の両方に追加する。
- * ファイルが存在しない場合は空の TeamsPool を返す。
+ * CSV テキストを直接受け取って TeamsPool を構築する。
+ * ファイルには書き込まない。
  */
-export function loadTeamsPoolFromCsv(): TeamsPool {
-  if (!fs.existsSync(CSV_PATH)) {
-    return { turfWar: [], splatZones: [] };
-  }
-
-  let raw: string;
-  try {
-    raw = fs.readFileSync(CSV_PATH, 'utf-8');
-  } catch (e) {
-    console.error(`[loadTeams] Failed to read ${CSV_PATH}:`, e);
-    return { turfWar: [], splatZones: [] };
-  }
-
+export function parseTeamsPoolFromCsvText(raw: string): TeamsPool {
   const rows = parseCsv(raw);
   if (rows.length === 0) {
     return { turfWar: [], splatZones: [] };
@@ -108,4 +88,17 @@ export function loadTeamsPoolFromCsv(): TeamsPool {
   }
 
   return pool;
+}
+
+/** data/teams.csv を読んで TeamsPool を構築する。ファイルが存在しない場合は空を返す。 */
+export function loadTeamsPoolFromCsv(): TeamsPool {
+  if (!fs.existsSync(CSV_PATH)) {
+    return { turfWar: [], splatZones: [] };
+  }
+  try {
+    return parseTeamsPoolFromCsvText(fs.readFileSync(CSV_PATH, 'utf-8'));
+  } catch (e) {
+    console.error(`[loadTeams] Failed to read ${CSV_PATH}:`, e);
+    return { turfWar: [], splatZones: [] };
+  }
 }
