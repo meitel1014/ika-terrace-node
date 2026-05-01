@@ -1,36 +1,5 @@
 .preview-edit-panel {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
   min-height: 476px; /* body padding 12px × 2 を除いた値で合計 500px */
-}
-
-.preview-column h3 {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  padding-bottom: 8px;
-  margin-bottom: 8px;
-  border-bottom: 2px solid var(--border);
-}
-
-.preview-alpha h3 {
-  font-size: 20px;
-  color: var(--accent-alpha);
-  border-bottom-color: color-mix(in srgb, var(--accent-alpha) 40%, transparent);
-}
-
-.preview-bravo h3 {
-  font-size: 20px;
-  color: var(--accent-bravo);
-  border-bottom-color: color-mix(in srgb, var(--accent-bravo) 40%, transparent);
-}
-
-.preview-empty {
-  color: var(--text-muted);
-  font-style: italic;
-  padding: 20px 0;
-  text-align: center;
 }
 
 .preview-table {
@@ -38,7 +7,34 @@
   border-collapse: collapse;
 }
 
-.preview-table th {
+/* ── ヘッダー行（アルファ / ブラボー）: colSpan=3 で各サイドが正確に 50% ── */
+
+.preview-alpha-header,
+.preview-bravo-header {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: left;
+  vertical-align: top;
+  padding: 0 0 8px;
+  border-bottom: 2px solid var(--border);
+  width: 50%; /* 各サイドを左右半々に固定 */
+}
+
+.preview-alpha-header {
+  color: var(--accent-alpha);
+  border-bottom-color: color-mix(in srgb, var(--accent-alpha) 40%, transparent);
+}
+
+.preview-bravo-header {
+  color: var(--accent-bravo);
+  border-bottom-color: color-mix(in srgb, var(--accent-bravo) 40%, transparent);
+}
+
+/* ── テーブル本体 ── */
+
+/* データ行のラベル列（各サイド先頭の <th>） */
+.preview-row-label {
   text-align: left;
   font-size: 13px;
   font-weight: 600;
@@ -56,6 +52,18 @@
 
 .preview-table tr + tr {
   border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+}
+
+/* スペーサー列: アルファ/ブラボー間の空白 */
+.preview-spacer-col {
+  min-width: 16px;
+  width: 16px;
+  padding: 0;
+  border: none !important;
+}
+
+.preview-bravo-col {
+  padding-left: 0;
 }
 
 .field-value {
@@ -94,20 +102,27 @@
   border-top: none !important;
 }
 
+/* ゲーム内名前行のラベル: preview-row-label を上書き */
 .preview-ingame-label {
-  font-size: 12px !important;
-  color: var(--text-muted) !important;
-  padding-left: 8px !important;
+  font-size: 12px;
+  color: var(--text-muted);
+  padding-left: 8px;
+  white-space: nowrap;
+  width: 1%;
+  vertical-align: top;
+  text-align: left;
+  font-weight: 600;
 }
+
 
 .field-value--readonly {
   color: var(--text-muted);
 }
 
-.preview-alpha .field-value--ingame {
+.field-value--ingame-alpha {
   color: var(--accent-alpha);
 }
 
-.preview-bravo .field-value--ingame {
+.field-value--ingame-bravo {
   color: var(--accent-bravo);
 }

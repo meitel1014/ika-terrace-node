@@ -33,17 +33,11 @@
 .flash-winner-alpha {
   --flash-bg: color-mix(in srgb, var(--accent-alpha) 25%, transparent);
   animation: flash-winner-blink 0.5s ease-in-out 7;
-  border-radius: 6px;
-  padding: 6px;
-  margin: -6px;
 }
 
 .flash-winner-bravo {
   --flash-bg: color-mix(in srgb, var(--accent-bravo) 25%, transparent);
   animation: flash-winner-blink 0.5s ease-in-out 7;
-  border-radius: 6px;
-  padding: 6px;
-  margin: -6px;
 }
 
 .results-empty,
@@ -117,9 +111,37 @@
   background: color-mix(in srgb, var(--accent-alpha) 8%, transparent);
 }
 
+/* 待機状態のアルファ/ブラボー表示（2列グリッド） */
+.results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
 .results-waiting-teams {
   margin-bottom: 12px;
   text-align: left;
+}
+
+.results-column h3 {
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+  border-bottom: 2px solid var(--border);
+}
+
+.results-alpha h3 {
+  color: var(--accent-alpha);
+  border-bottom-color: color-mix(in srgb, var(--accent-alpha) 40%, transparent);
+}
+
+.results-bravo h3 {
+  color: var(--accent-bravo);
+  border-bottom-color: color-mix(in srgb, var(--accent-bravo) 40%, transparent);
 }
 
 .results-current-teams {
@@ -254,31 +276,10 @@
   white-space: nowrap;
 }
 
-.results-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
+/* ── 統合テーブル（CandidateEditor） ── */
 
-.results-column h3 {
-  font-size: 16px;
-  font-weight: 700;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 6px;
-  margin-bottom: 6px;
-  border-bottom: 2px solid var(--border);
-}
-
-.results-alpha h3 {
-  color: var(--accent-alpha);
-  border-bottom-color: color-mix(in srgb, var(--accent-alpha) 40%, transparent);
-}
-
-.results-bravo h3 {
-  color: var(--accent-bravo);
-  border-bottom-color: color-mix(in srgb, var(--accent-bravo) 40%, transparent);
+.results-table-wrapper {
+  border-radius: var(--radius);
 }
 
 .results-table {
@@ -287,13 +288,54 @@
   font-size: 14px;
 }
 
-.results-table thead th {
+/* チームヘッダー行 */
+.results-side-header {
+  font-size: 16px;
+  font-weight: 700;
+  text-align: left;
+  vertical-align: top;
+  padding: 6px 0;
+  border-bottom: 2px solid var(--border);
+  width: 50%; /* 各サイドを左右半々に固定 */
+}
+
+/* 元の h3 の flex レイアウト（チーム名左寄せ・勝利ボタン右寄せ）を再現 */
+.results-side-header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.results-alpha-header {
+  color: var(--accent-alpha);
+  border-bottom-color: color-mix(in srgb, var(--accent-alpha) 40%, transparent);
+}
+
+.results-bravo-header {
+  color: var(--accent-bravo);
+  border-bottom-color: color-mix(in srgb, var(--accent-bravo) 40%, transparent);
+}
+
+/* スペーサー列: アルファ/ブラボー間の空白 */
+.results-spacer-col {
+  min-width: 16px;
+  width: 16px;
+  padding: 0;
+  border: none !important;
+}
+
+/* カラムラベル行 */
+.results-table thead tr:nth-child(2) th {
   text-align: left;
   font-size: 12px;
   font-weight: 600;
   color: var(--text-muted);
   padding: 4px 6px 4px 0;
   letter-spacing: 0.04em;
+}
+
+.results-bravo-pos {
+  padding-left: 0;
 }
 
 .results-table tbody th {
@@ -310,7 +352,7 @@
 }
 
 .results-table select {
-  width: 75%;
+  width: 90%;
   padding: 4px 6px;
   font-size: 14px;
   background: var(--bg-input);
@@ -326,11 +368,11 @@
   margin-top: 2px;
 }
 
-.results-alpha .player-ingame-name {
+.results-alpha-td .player-ingame-name {
   color: var(--accent-alpha);
 }
 
-.results-bravo .player-ingame-name {
+.results-bravo-td .player-ingame-name {
   color: var(--accent-bravo);
 }
 
@@ -353,6 +395,7 @@ button.btn-winner {
   padding: 4px 20px;
   border-color: var(--border);
   color: var(--text-muted);
+  word-break: keep-all;
   background: transparent;
 }
 

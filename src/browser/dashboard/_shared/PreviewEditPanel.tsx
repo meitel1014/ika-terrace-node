@@ -8,14 +8,12 @@ import type { Team } from '@/schemas';
 
 type Props = { mode: Mode };
 
-/** チーム情報（alias / name）の編集対象 */
 type EditTarget = {
   side: Side;
   field: 'name' | 'alias';
   value: string;
 };
 
-/** ゲーム内名前の編集対象 */
 type EditInGameTarget = {
   playerName: string;
   value: string;
@@ -32,6 +30,10 @@ function buildPatch(field: EditTarget['field'], value: string): Partial<Team> {
 }
 
 const PLAYER_LABELS = ['プレイヤー1', 'プレイヤー2', 'プレイヤー3', 'プレイヤー4'] as const;
+const TEAM_FIELDS: { field: EditTarget['field']; label: string }[] = [
+  { field: 'alias', label: '二つ名' },
+  { field: 'name', label: 'チーム名 (左右用)' },
+];
 
 export function PreviewEditPanel({ mode }: Props) {
   const [teamsPool] = useReplicant('teamsPool');
@@ -92,129 +94,170 @@ export function PreviewEditPanel({ mode }: Props) {
     if (e.key === 'Escape') cancelInGameEdit();
   };
 
-  const renderTeamPreview = (side: Side, team: Team | null) => {
+  // ── セルレンダラー（side ごとにラベル込み 3 セルを返す） ──
+
+  const renderFieldCells = (side: Side, field: EditTarget['field'], team: Team | null, label: string) => {
+    const labelClass = `preview-row-label${side === 'bravo' ? ' preview-bravo-col' : ''}`;
     if (!team) {
       return (
-        <div className={`preview-column preview-${side}`}>
-          <h3>{side === 'alpha' ? 'アルファ' : 'ブラボー'}</h3>
-          <p className="preview-empty">未選択</p>
-        </div>
+        <>
+          <th className={labelClass}>{label}</th>
+          <td />
+          <td className="action-cell" />
+        </>
       );
     }
-
-    const teamFields: { field: EditTarget['field']; label: string }[] = [
-      { field: 'alias', label: '二つ名' },
-      { field: 'name', label: 'チーム名 (左右用)' },
-    ];
-
+    const isEditing = editTarget?.side === side && editTarget?.field === field;
+    const displayValue = getFieldValue(team, field);
     return (
-      <div className={`preview-column preview-${side}`}>
-        <h3>{side === 'alpha' ? 'アルファ' : 'ブラボー'} | {team.id}</h3>
-        <table className="preview-table">
-          <tbody>
-            {/* 二つ名・チーム名（編集可） */}
-            {teamFields.map(({ field, label }) => {
-              const isEditing = editTarget?.side === side && editTarget?.field === field;
-              const displayValue = getFieldValue(team, field);
-              return (
-                <tr key={field}>
-                  <th>{label}</th>
-                  <td>
-                    {isEditing ? (
-                      <input
-                        className="edit-input"
-                        value={editTarget.value}
-                        onChange={(e) => setEditTarget({ ...editTarget, value: e.target.value })}
-                        onKeyDown={handleKeyDown}
-                        autoFocus
-                      />
-                    ) : field === 'name' ? (
-                      <span className="field-value">{displayValue}</span>
-                    ) : (
-                      <Html value={displayValue} as="span" className="field-value" />
-                    )}
-                  </td>
-                  <td className="action-cell">
-                    {isEditing ? (
-                      <>
-                        <button className="btn-sm btn-save" onClick={saveEdit}>保存</button>
-                        <button className="btn-sm btn-cancel" onClick={cancelEdit}>取消</button>
-                      </>
-                    ) : (
-                      <button className="btn-sm btn-edit" onClick={() => startEdit(side, field, team)}>
-                        編集
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
+      <>
+        <th className={labelClass}>{label}</th>
+        <td>
+          {isEditing ? (
+            <input
+              className="edit-input"
+              value={editTarget.value}
+              onChange={(e) => setEditTarget({ ...editTarget, value: e.target.value })}
+              onKeyDown={handleKeyDown}
+              autoFocus
+            />
+          ) : field === 'name' ? (
+            <span className="field-value">{displayValue}</span>
+          ) : (
+            <Html value={displayValue} as="span" className="field-value" />
+          )}
+        </td>
+        <td className="action-cell">
+          {isEditing ? (
+            <>
+              <button className="btn-sm btn-save" onClick={saveEdit}>保存</button>
+              <button className="btn-sm btn-cancel" onClick={cancelEdit}>取消</button>
+            </>
+          ) : (
+            <button className="btn-sm btn-edit" onClick={() => startEdit(side, field, team)}>
+              編集
+            </button>
+          )}
+        </td>
+      </>
+    );
+  };
 
-            {/* プレイヤー名（読み取り専用） + ゲーム内名前（編集可） */}
-            {team.players.map((playerName, idx) => {
-              const currentInGame = inGameNames?.[playerName] ?? playerName;
-              const isEditingInGame = editInGame?.playerName === playerName;
-              const isDifferent = currentInGame !== playerName;
+  const renderPlayerNameCells = (side: Side, team: Team | null, idx: number) => {
+    const labelClass = `preview-row-label${side === 'bravo' ? ' preview-bravo-col' : ''}`;
+    if (!team) {
+      return (
+        <>
+          <th className={labelClass}>{PLAYER_LABELS[idx]}</th>
+          <td />
+          <td className="action-cell" />
+        </>
+      );
+    }
+    const playerName = team.players[idx] ?? '';
+    return (
+      <>
+        <th className={labelClass}>{PLAYER_LABELS[idx]}</th>
+        <td>
+          <span className="field-value field-value--readonly">
+            {stripHtml(playerName) || '(空欄)'}
+          </span>
+        </td>
+        <td className="action-cell" />
+      </>
+    );
+  };
 
-              return (
-                <Fragment key={idx}>
-                  {/* 登録名行（読み取り専用） */}
-                  <tr>
-                    <th>{PLAYER_LABELS[idx]}</th>
-                    <td>
-                      <span className="field-value field-value--readonly">
-                        {stripHtml(playerName) || '(空欄)'}
-                      </span>
-                    </td>
-                    <td className="action-cell" />
-                  </tr>
-                  {/* ゲーム内名前行 */}
-                  <tr className="preview-ingame-row">
-                    <th className="preview-ingame-label">↳ゲーム内</th>
-                    <td>
-                      {isEditingInGame ? (
-                        <input
-                          className="edit-input"
-                          value={editInGame.value}
-                          onChange={(e) => setEditInGame({ ...editInGame, value: e.target.value })}
-                          onKeyDown={handleInGameKeyDown}
-                          autoFocus
-                        />
-                      ) : (
-                        <span className={`field-value${isDifferent ? ' field-value--ingame' : ''}`}>
-                          {currentInGame || '(空欄)'}
-                        </span>
-                      )}
-                    </td>
-                    <td className="action-cell">
-                      {isEditingInGame ? (
-                        <>
-                          <button className="btn-sm btn-save" onClick={saveInGameEdit}>保存</button>
-                          <button className="btn-sm btn-cancel" onClick={cancelInGameEdit}>取消</button>
-                        </>
-                      ) : (
-                        <button
-                          className="btn-sm btn-edit"
-                          onClick={() => startInGameEdit(playerName, currentInGame)}
-                        >
-                          編集
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                </Fragment>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+  const renderInGameCells = (side: Side, team: Team | null, idx: number) => {
+    const labelClass = `preview-ingame-label${side === 'bravo' ? ' preview-bravo-col' : ''}`;
+    if (!team) {
+      return (
+        <>
+          <th className={labelClass}>↳ゲーム内</th>
+          <td />
+          <td className="action-cell" />
+        </>
+      );
+    }
+    const playerName = team.players[idx] ?? '';
+    const currentInGame = inGameNames?.[playerName] ?? playerName;
+    const isEditingInGame = editInGame?.playerName === playerName;
+    const isDifferent = currentInGame !== playerName;
+    return (
+      <>
+        <th className={labelClass}>↳ゲーム内</th>
+        <td>
+          {isEditingInGame ? (
+            <input
+              className="edit-input"
+              value={editInGame.value}
+              onChange={(e) => setEditInGame({ ...editInGame, value: e.target.value })}
+              onKeyDown={handleInGameKeyDown}
+              autoFocus
+            />
+          ) : (
+            <span className={`field-value${isDifferent ? ` field-value--ingame field-value--ingame-${side}` : ''}`}>
+              {currentInGame || '(空欄)'}
+            </span>
+          )}
+        </td>
+        <td className="action-cell">
+          {isEditingInGame ? (
+            <>
+              <button className="btn-sm btn-save" onClick={saveInGameEdit}>保存</button>
+              <button className="btn-sm btn-cancel" onClick={cancelInGameEdit}>取消</button>
+            </>
+          ) : (
+            <button
+              className="btn-sm btn-edit"
+              onClick={() => startInGameEdit(playerName, currentInGame)}
+            >
+              編集
+            </button>
+          )}
+        </td>
+      </>
     );
   };
 
   return (
     <div className="preview-edit-panel">
-      {renderTeamPreview('alpha', alphaTeam)}
-      {renderTeamPreview('bravo', bravoTeam)}
+      <table className="preview-table">
+        <thead>
+          <tr>
+            <th colSpan={3} className="preview-alpha-header">
+              アルファ{alphaTeam ? ` | ${alphaTeam.id}` : ''}
+            </th>
+            <th className="preview-spacer-col" />
+            <th colSpan={3} className="preview-bravo-header">
+              ブラボー{bravoTeam ? ` | ${bravoTeam.id}` : ''}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {TEAM_FIELDS.map(({ field, label }) => (
+            <tr key={field}>
+              {renderFieldCells('alpha', field, alphaTeam, label)}
+              <td className="preview-spacer-col" />
+              {renderFieldCells('bravo', field, bravoTeam, label)}
+            </tr>
+          ))}
+          {[0, 1, 2, 3].map((idx) => (
+            <Fragment key={idx}>
+              <tr>
+                {renderPlayerNameCells('alpha', alphaTeam, idx)}
+                <td className="preview-spacer-col" />
+                {renderPlayerNameCells('bravo', bravoTeam, idx)}
+              </tr>
+              <tr className="preview-ingame-row">
+                {renderInGameCells('alpha', alphaTeam, idx)}
+                <td className="preview-spacer-col" />
+                {renderInGameCells('bravo', bravoTeam, idx)}
+              </tr>
+            </Fragment>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
