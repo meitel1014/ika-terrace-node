@@ -223,6 +223,15 @@ export function PreviewEditPanel({ mode }: Props) {
   return (
     <div className="preview-edit-panel">
       <table className="preview-table">
+        <colgroup>
+          <col className="preview-col-label" />
+          <col className="preview-col-text"/>
+          <col className="preview-col-action" />
+          <col className="preview-col-spacer" />
+          <col className="preview-col-label" />
+          <col className="preview-col-text"/>
+          <col className="preview-col-action" />
+        </colgroup>
         <thead>
           <tr>
             <th colSpan={3} className="preview-alpha-header">

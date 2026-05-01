@@ -1,24 +1,43 @@
 .preview-edit-panel {
-  min-height: 476px; /* body padding 12px × 2 を除いた値で合計 500px */
+  min-height: 476px;
+  /* body padding 12px × 2 を除いた値で合計 500px */
 }
 
 .preview-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.preview-col-label {
+  width: 20%;
+}
+
+.preview-col-action {
+  width: 10%;
+}
+
+.preview-col-spacer {
+  width: 16px;
+}
+
+.preview-col-text {
+  width: 50%;
 }
 
 /* ── ヘッダー行（アルファ / ブラボー）: colSpan=3 で各サイドが正確に 50% ── */
 
 .preview-alpha-header,
 .preview-bravo-header {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-align: left;
   vertical-align: top;
   padding: 0 0 8px;
   border-bottom: 2px solid var(--border);
-  width: 50%; /* 各サイドを左右半々に固定 */
+  width: 50%;
+  /* 各サイドを左右半々に固定 */
 }
 
 .preview-alpha-header {
@@ -36,10 +55,10 @@
 /* データ行のラベル列（各サイド先頭の <th>） */
 .preview-row-label {
   text-align: left;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-muted);
-  padding: 6px 8px 6px 0;
+  padding: 8px 8px 8px 0;
   white-space: nowrap;
   width: 1%;
   vertical-align: top;
@@ -50,7 +69,7 @@
   vertical-align: middle;
 }
 
-.preview-table tr + tr {
+.preview-table tr+tr {
   border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
 }
 
@@ -69,7 +88,7 @@
 .field-value {
   display: block;
   min-height: 1.4em;
-  word-break: break-all;
+  word-break: break-word;
 }
 
 .action-cell {
