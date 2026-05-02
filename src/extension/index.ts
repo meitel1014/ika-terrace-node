@@ -4,7 +4,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import sharp from 'sharp';
 import type { NodeCG } from './nodecg';
-import { loadTeamsPoolFromCsv } from './loadTeams';
+import { loadTeamsPoolFromCsv, parseTeamsPoolFromCsvText } from './loadTeams';
 import { loadWeaponAliasesFromCsv } from './weaponAliases';
 import { loadInGameNamesFromCsv } from './loadInGameNames';
 import { appendRecordCsv, appendRecordGoogleSheet } from './appendRecord';
@@ -120,6 +120,8 @@ export default (nodecg: NodeCG) => {
 
   // OBS・外部ツールから base64 PNG を受け取り OCR を実行するエンドポイント
   // POST /weapons  (body: <raw base64 PNG>, Content-Type: text/plain)
+  const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10 MB: base64 PNG として 1920×1080 以上をカバー
+
   nodecg.mount('/weapons', (req, res) => {
     if (req.method !== 'POST') {
       res.status(405).end();
@@ -138,9 +140,23 @@ export default (nodecg: NodeCG) => {
     const filename = `weapons-${Date.now()}.png`;
 
     // NodeCG の global JSON body-parser（100kb 制限）を回避するためストリームで収集
+    let weaponsTotalBytes = 0;
+    let weaponsOversized = false;
     const chunks: Buffer[] = [];
-    req.on('data', (chunk: Buffer) => chunks.push(chunk));
+    req.on('data', (chunk: Buffer) => {
+      weaponsTotalBytes += chunk.length;
+      if (weaponsTotalBytes > MAX_IMAGE_BYTES) {
+        if (!weaponsOversized) {
+          weaponsOversized = true;
+          res.status(413).json({ error: 'payload too large' });
+          req.destroy();
+        }
+        return;
+      }
+      chunks.push(chunk);
+    });
     req.on('end', () => {
+      if (weaponsOversized) return;
       const content = Buffer.concat(chunks).toString('utf8').trim();
       if (!content) {
         res.status(400).json({ error: 'empty body' });
@@ -206,9 +222,23 @@ export default (nodecg: NodeCG) => {
     const mode: Mode = activeModeRep.value ?? 'turfWar';
     const filename = `stage-${Date.now()}.png`;
 
+    let stageTotalBytes = 0;
+    let stageOversized = false;
     const chunks: Buffer[] = [];
-    req.on('data', (chunk: Buffer) => chunks.push(chunk));
+    req.on('data', (chunk: Buffer) => {
+      stageTotalBytes += chunk.length;
+      if (stageTotalBytes > MAX_IMAGE_BYTES) {
+        if (!stageOversized) {
+          stageOversized = true;
+          res.status(413).json({ error: 'payload too large' });
+          req.destroy();
+        }
+        return;
+      }
+      chunks.push(chunk);
+    });
     req.on('end', () => {
+      if (stageOversized) return;
       const content = Buffer.concat(chunks).toString('utf8').trim();
       if (!content) {
         res.status(400).json({ error: 'empty body' });
@@ -309,6 +339,63 @@ export default (nodecg: NodeCG) => {
     } else {
       log.info(`[result] received '${result}' but no candidates in ${mode} queue`);
     }
+  });
+
+  // POST /upload-teams-csv  (body: UTF-8 CSV text, Content-Type: text/plain)
+  const MAX_CSV_BYTES = 1 * 1024 * 1024; // 1 MB: チーム情報CSVとして十分な上限
+
+  nodecg.mount('/upload-teams-csv', (req, res) => {
+    if (req.method !== 'POST') {
+      res.status(405).end();
+      return;
+    }
+
+    let totalBytes = 0;
+    let oversized = false
+    ;
+    const chunks: Buffer[] = [];
+
+    req.on('data', (chunk: Buffer) => {
+      totalBytes += chunk.length;
+      if (totalBytes > MAX_CSV_BYTES) {
+        if (!oversized) {
+          oversized = true;
+          res.status(413).json({ error: 'payload too large' });
+          req.destroy();
+        }
+        return;
+      }
+      chunks.push(chunk);
+    });
+
+    req.on('end', () => {
+      if (oversized) return;
+
+      const csvText = Buffer.concat(chunks).toString('utf-8');
+      if (!csvText.trim()) {
+        res.status(400).json({ error: 'empty body' });
+        return;
+      }
+
+      let loaded;
+      try {
+        loaded = parseTeamsPoolFromCsvText(csvText);
+      } catch (e) {
+        log.error('[upload-teams-csv] CSV パース失敗', e);
+        res.status(400).json({ error: 'invalid CSV' });
+        return;
+      }
+
+      teamsPoolRep.value = loaded;
+      log.info(
+        `[upload-teams-csv] turfWar=${loaded.turfWar.length}, splatZones=${loaded.splatZones.length}`
+      );
+      res.status(200).json({ turfWar: loaded.turfWar.length, splatZones: loaded.splatZones.length });
+    });
+
+    req.on('error', (e) => {
+      log.error('[upload-teams-csv] リクエストエラー', e);
+    });
   });
 
   // ── Message ハンドラ ───────────────────────────────────
@@ -509,14 +596,6 @@ export default (nodecg: NodeCG) => {
       ...cands,
       [mode]: queue.map((c, i) => (i === candidateIndex ? { ...c, stageName } : c)),
     };
-    if (ack && !ack.handled) ack(null);
-  });
-
-  nodecg.listenFor('reloadInGameNamesCsv', (_data, ack) => {
-    inGameNamesRep.value = loadInGameNamesFromCsv();
-    log.info(
-      `Reloaded in-game names: ${Object.keys(inGameNamesRep.value ?? {}).length} entries`
-    );
     if (ack && !ack.handled) ack(null);
   });
 

@@ -10,7 +10,7 @@ type Props = { mode: Mode };
 
 type EditTarget = {
   side: Side;
-  field: 'name' | 'alias';
+  field: 'viewname' | 'alias';
   value: string;
 };
 
@@ -20,19 +20,19 @@ type EditInGameTarget = {
 };
 
 function getFieldValue(team: Team, field: EditTarget['field']): string {
-  if (field === 'name') return team.name;
+  if (field === 'viewname') return team.viewname;
   return team.alias;
 }
 
 function buildPatch(field: EditTarget['field'], value: string): Partial<Team> {
-  if (field === 'name') return { name: value };
+  if (field === 'viewname') return { viewname: value };
   return { alias: value };
 }
 
 const PLAYER_LABELS = ['プレイヤー1', 'プレイヤー2', 'プレイヤー3', 'プレイヤー4'] as const;
 const TEAM_FIELDS: { field: EditTarget['field']; label: string }[] = [
   { field: 'alias', label: '二つ名' },
-  { field: 'name', label: 'チーム名 (左右用)' },
+  { field: 'viewname', label: 'チーム名 (左右用)' },
 ];
 
 export function PreviewEditPanel({ mode }: Props) {
@@ -121,7 +121,7 @@ export function PreviewEditPanel({ mode }: Props) {
               onKeyDown={handleKeyDown}
               autoFocus
             />
-          ) : field === 'name' ? (
+          ) : field === 'viewname' ? (
             <span className="field-value">{displayValue}</span>
           ) : (
             <Html value={displayValue} as="span" className="field-value" />
@@ -235,11 +235,11 @@ export function PreviewEditPanel({ mode }: Props) {
         <thead>
           <tr>
             <th colSpan={3} className="preview-alpha-header">
-              アルファ{alphaTeam ? ` | ${alphaTeam.id}` : ''}
+              アルファ{alphaTeam ? ` | ${alphaTeam.name}` : ''}
             </th>
             <th className="preview-spacer-col" />
             <th colSpan={3} className="preview-bravo-header">
-              ブラボー{bravoTeam ? ` | ${bravoTeam.id}` : ''}
+              ブラボー{bravoTeam ? ` | ${bravoTeam.name}` : ''}
             </th>
           </tr>
         </thead>

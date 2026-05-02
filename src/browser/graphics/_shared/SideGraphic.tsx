@@ -27,7 +27,7 @@ function TeamSlot({ mode, side }: { mode: Mode; side: Side }) {
         <div className="side-team-content">
           <Html value={team.alias} as="div" className="side-alias" />
           <FitText
-            html={team.name}
+            html={team.viewname}
             align={align}
             className="side-team-name"
           />

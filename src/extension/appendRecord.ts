@@ -76,7 +76,7 @@ function buildSideWeapons(
 ): { teamName: string; weapons: string[] } {
   const team = resolveTeam(pool, mode, side.teamId);
   return {
-    teamName: side.teamId,
+    teamName: team?.name ?? side.teamId,
     weapons: sortWeaponsByTeamOrder(side.picks, team, aliases),
   };
 }
