@@ -100,22 +100,25 @@ function parseCsv(input) {
 
 // ─── チームローダー（src/extension/loadTeams.ts の移植） ──────────────────────
 
-// 参照元: src/extension/loadTeams.ts の HEADERS / MODE_LABEL_TO_KEY
-const HEADERS = {
-  mode:        'ルール',
-  name:        'チーム名',
-  player1:     'メンバー1の名前',
-  player2:     'メンバー2の名前',
-  player3:     'メンバー3の名前',
-  player4:     'メンバー4の名前',
-  alias:       '二つ名',
-  displayName: 'チーム名(表示用)',
-};
-
+// 参照元: src/extension/loadTeams.ts の MODE_LABEL_TO_KEY
 const MODE_LABEL_TO_KEY = {
   ナワバリトーナメント: 'turfWar',
   エリアトーナメント:   'splatZones',
 };
+
+// 参照元: src/extension/loadTeams.ts の PLAYER_DIGITS / findPlayerColumnIndex
+// 申請フォームによる表記揺れ（半角/全角/丸数字）に対応するため柔軟に検出する
+const PLAYER_DIGITS = [
+  ['1', '１', '①'],
+  ['2', '２', '②'],
+  ['3', '３', '③'],
+  ['4', '４', '④'],
+];
+
+function findPlayerColumnIndex(header, playerNum) {
+  const digits = PLAYER_DIGITS[playerNum];
+  return header.findIndex(h => digits.some(d => h.includes(d)));
+}
 
 function loadTeams() {
   const csvPath = path.join(PROJECT_ROOT, 'data/teams.csv');
@@ -124,32 +127,53 @@ function loadTeams() {
   if (rows.length === 0) return { turfWar: [], splatZones: [] };
 
   const header = rows[0].map(h => h.trim());
-  const idx = Object.fromEntries(
-    Object.entries(HEADERS).map(([k, v]) => [k, header.indexOf(v)]),
-  );
 
+  // 参照元: src/extension/loadTeams.ts の idx 構築
+  const idx = {
+    mode:     header.indexOf('ルール'),
+    name:     header.indexOf('チーム名'),
+    viewname: header.indexOf('チーム名(表示用)'),
+    alias:    header.indexOf('二つ名'),
+    players: [
+      findPlayerColumnIndex(header, 0),
+      findPlayerColumnIndex(header, 1),
+      findPlayerColumnIndex(header, 2),
+      findPlayerColumnIndex(header, 3),
+    ],
+  };
+
+  const noRuleColumn = idx.mode < 0;
   const pool = { turfWar: [], splatZones: [] };
+  let serial = 0;
 
   for (const row of rows.slice(1)) {
-    const modeLabel = row[idx.mode]?.trim() ?? '';
-    const modeKey = MODE_LABEL_TO_KEY[modeLabel];
-    if (!modeKey) continue;
-
-    const rawName = (row[idx.name] ?? '').trim();
+    const rawName = idx.name >= 0 ? (row[idx.name] ?? '').trim() : '';
     if (!rawName) continue;
 
-    const rawDisplayName = idx.displayName >= 0 ? (row[idx.displayName] ?? '').trim() : '';
-    pool[modeKey].push({
-      id:      rawName,
-      name:    rawDisplayName || rawName,
-      alias:   (row[idx.alias]   ?? '').trim(),
+    serial++;
+    const rawViewname = idx.viewname >= 0 ? (row[idx.viewname] ?? '').trim() : '';
+
+    const team = {
+      id:       String(serial),          // 連番文字列（Replicant 検索キー）
+      name:     rawName,                 // CSV 原本チーム名（編集禁止、records.csv 出力用）
+      viewname: rawViewname || rawName,  // 表示用チーム名（HTML 可、Graphic 専用）
+      alias:    idx.alias >= 0 ? (row[idx.alias] ?? '').trim() : '',
       players: [
-        (row[idx.player1] ?? '').trim(),
-        (row[idx.player2] ?? '').trim(),
-        (row[idx.player3] ?? '').trim(),
-        (row[idx.player4] ?? '').trim(),
+        idx.players[0] >= 0 ? (row[idx.players[0]] ?? '').trim() : '',
+        idx.players[1] >= 0 ? (row[idx.players[1]] ?? '').trim() : '',
+        idx.players[2] >= 0 ? (row[idx.players[2]] ?? '').trim() : '',
+        idx.players[3] >= 0 ? (row[idx.players[3]] ?? '').trim() : '',
       ],
-    });
+    };
+
+    if (noRuleColumn) {
+      pool.turfWar.push(team);
+      pool.splatZones.push(team);
+    } else {
+      const modeLabel = (row[idx.mode] ?? '').trim();
+      const modeKey = MODE_LABEL_TO_KEY[modeLabel];
+      if (modeKey) pool[modeKey].push(team);
+    }
   }
 
   return pool;
@@ -213,7 +237,7 @@ ${css}
 
 // ─── under HTML ────────────────────────────────────────────────────────────────
 // 参照元（構造）: src/browser/graphics/_shared/UnderGraphic.tsx の TeamSlot
-// 参照元（表示）: チーム名 → stripHtml(team.name)、プレイヤー → team.players.join('　')
+// 参照元（表示）: チーム名 → team.name（CSV 原本、HTML なし）、プレイヤー → team.players.join('　')
 
 function buildUnderHtml(team) {
   // SHADOW 参照元: UnderGraphic.tsx の const SHADOW
@@ -239,7 +263,7 @@ ${buildHead(UNDER_CSS, 70)}
 //   TeamSlot    → .side-slot → .side-team-content → alias / team-name / players
 // 参照元（表示）:
 //   alias    → team.alias を innerHTML として描画（Html コンポーネント相当）
-//   チーム名 → team.name を innerHTML + FitText スケール（FitText コンポーネント相当）
+//   チーム名 → team.viewname を innerHTML + FitText スケール（FitText コンポーネント相当）
 //   プレイヤー → team.players.map() で各行
 //
 // ビューポート 1920×1080 で NodeCG と同じ構造をレンダリングし、
@@ -265,7 +289,7 @@ function buildSideHtml(team, side) {
     <div class="side-team-content">
       <div class="side-alias">${team.alias}</div>
       <div class="side-team-name" id="fit-container">
-        <span id="fit-inner" style="display:inline-block;white-space:nowrap">${team.name}</span>
+        <span id="fit-inner" style="display:inline-block;white-space:nowrap">${team.viewname}</span>
       </div>
       <div class="side-players">
         ${team.players.map(p => `<div class="side-player">${p}</div>`).join('\n        ')}
@@ -370,7 +394,7 @@ async function main() {
           { width: 960, height: 70 },
           { x: 0, y: 0, width: 960, height: 70 },
         );
-        writeFileSync(path.join(underDir, `${team.id}.png`), underBuf);
+        writeFileSync(path.join(underDir, `${team.name}.png`), underBuf);
 
         // side: 1920×1080 でレンダリングし、alpha(x:0) / bravo(x:960) を clip で切り出す
         for (const side of ['alpha', 'bravo']) {
@@ -384,11 +408,11 @@ async function main() {
             { x: side === 'alpha' ? 0 : 960, y: 0, width: 960, height: 1080 },
             true,
           );
-          writeFileSync(path.join(sideDir, `${team.id}.png`), sideBuf);
+          writeFileSync(path.join(sideDir, `${team.name}.png`), sideBuf);
         }
 
         done++;
-        console.log(`[${done}/${totalTeams}] ${RULE_LABEL[rule]} / ${team.id}`);
+        console.log(`[${done}/${totalTeams}] ${RULE_LABEL[rule]} / ${team.name}`);
       }
     }
   } finally {
