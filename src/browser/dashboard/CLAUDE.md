@@ -22,3 +22,9 @@
 ## fullbleed パネルの注意点
 
 `fullbleed: true` のパネルは NodeCG がワークスペースを自動生成するため、`package.json` の dashboardPanels エントリに **`workspace` を同時指定してはいけない**（起動時エラーになる）。ワークスペース名はパネルの `title` をもとに NodeCG が決める。
+
+## `_shared/` コンポーネントの実装メモ
+
+- **PreviewEditPanel / ResultsPanel**: アルファ/ブラボーを単一 `<table>` で横並びにして行高を揃える（2 列グリッドでは `h3` の改行時にズレる）。スペーサー列（`preview-spacer-col` / `results-spacer-col`、`min-width: 16px`、`border: none`）でサイド間の空白を確保。
+- **ステージフラッシュの手動/自動判別**: `manualStageRef` フラグで `handleStageChange`（手動）と `/stage` 自動入力を区別してアニメーションをスキップ（`wonSideFlash` と同パターン）。
+- **CSV アップロード**: `settings-csv-reload` パネルはファイル選択で `POST /upload-teams-csv` へ送信。`useReloadButton` フックで再読込ボタンの状態管理（`idle` / `loading` / `done` / `error`）を共通化。
