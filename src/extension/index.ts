@@ -120,6 +120,8 @@ export default (nodecg: NodeCG) => {
 
   // OBS・外部ツールから base64 PNG を受け取り OCR を実行するエンドポイント
   // POST /weapons  (body: <raw base64 PNG>, Content-Type: text/plain)
+  const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10 MB: base64 PNG として 1920×1080 以上をカバー
+
   nodecg.mount('/weapons', (req, res) => {
     if (req.method !== 'POST') {
       res.status(405).end();
@@ -138,9 +140,23 @@ export default (nodecg: NodeCG) => {
     const filename = `weapons-${Date.now()}.png`;
 
     // NodeCG の global JSON body-parser（100kb 制限）を回避するためストリームで収集
+    let weaponsTotalBytes = 0;
+    let weaponsOversized = false;
     const chunks: Buffer[] = [];
-    req.on('data', (chunk: Buffer) => chunks.push(chunk));
+    req.on('data', (chunk: Buffer) => {
+      weaponsTotalBytes += chunk.length;
+      if (weaponsTotalBytes > MAX_IMAGE_BYTES) {
+        if (!weaponsOversized) {
+          weaponsOversized = true;
+          res.status(413).json({ error: 'payload too large' });
+          req.destroy();
+        }
+        return;
+      }
+      chunks.push(chunk);
+    });
     req.on('end', () => {
+      if (weaponsOversized) return;
       const content = Buffer.concat(chunks).toString('utf8').trim();
       if (!content) {
         res.status(400).json({ error: 'empty body' });
@@ -206,9 +222,23 @@ export default (nodecg: NodeCG) => {
     const mode: Mode = activeModeRep.value ?? 'turfWar';
     const filename = `stage-${Date.now()}.png`;
 
+    let stageTotalBytes = 0;
+    let stageOversized = false;
     const chunks: Buffer[] = [];
-    req.on('data', (chunk: Buffer) => chunks.push(chunk));
+    req.on('data', (chunk: Buffer) => {
+      stageTotalBytes += chunk.length;
+      if (stageTotalBytes > MAX_IMAGE_BYTES) {
+        if (!stageOversized) {
+          stageOversized = true;
+          res.status(413).json({ error: 'payload too large' });
+          req.destroy();
+        }
+        return;
+      }
+      chunks.push(chunk);
+    });
     req.on('end', () => {
+      if (stageOversized) return;
       const content = Buffer.concat(chunks).toString('utf8').trim();
       if (!content) {
         res.status(400).json({ error: 'empty body' });
