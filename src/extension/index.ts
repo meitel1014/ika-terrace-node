@@ -312,22 +312,50 @@ export default (nodecg: NodeCG) => {
   });
 
   // POST /upload-teams-csv  (body: UTF-8 CSV text, Content-Type: text/plain)
+  const MAX_CSV_BYTES = 1 * 1024 * 1024; // 1 MB: チーム情報CSVとして十分な上限
+
   nodecg.mount('/upload-teams-csv', (req, res) => {
     if (req.method !== 'POST') {
       res.status(405).end();
       return;
     }
 
+    let totalBytes = 0;
+    let oversized = false
+    ;
     const chunks: Buffer[] = [];
-    req.on('data', (chunk: Buffer) => chunks.push(chunk));
+
+    req.on('data', (chunk: Buffer) => {
+      totalBytes += chunk.length;
+      if (totalBytes > MAX_CSV_BYTES) {
+        if (!oversized) {
+          oversized = true;
+          res.status(413).json({ error: 'payload too large' });
+          req.destroy();
+        }
+        return;
+      }
+      chunks.push(chunk);
+    });
+
     req.on('end', () => {
+      if (oversized) return;
+
       const csvText = Buffer.concat(chunks).toString('utf-8');
       if (!csvText.trim()) {
         res.status(400).json({ error: 'empty body' });
         return;
       }
 
-      const loaded = parseTeamsPoolFromCsvText(csvText);
+      let loaded;
+      try {
+        loaded = parseTeamsPoolFromCsvText(csvText);
+      } catch (e) {
+        log.error('[upload-teams-csv] CSV パース失敗', e);
+        res.status(400).json({ error: 'invalid CSV' });
+        return;
+      }
+
       teamsPoolRep.value = loaded;
       log.info(
         `[upload-teams-csv] turfWar=${loaded.turfWar.length}, splatZones=${loaded.splatZones.length}`
