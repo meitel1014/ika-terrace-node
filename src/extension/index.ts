@@ -7,6 +7,8 @@ import type { NodeCG } from './nodecg';
 import { loadTeamsPoolFromCsv, parseTeamsPoolFromCsvText } from './loadTeams';
 import { loadWeaponAliasesFromCsv } from './weaponAliases';
 import { loadInGameNamesFromCsv } from './loadInGameNames';
+import { loadCastCandidates } from './loadCastCandidates';
+import { castCandidatesSchema } from '../schemas';
 import { appendRecordCsv, appendRecordGoogleSheet } from './appendRecord';
 import { pushToQueue } from './candidateQueue';
 import { loadWeaponTemplates } from './ocr/matchWeapon';
@@ -41,6 +43,8 @@ export default (nodecg: NodeCG) => {
   const activeModeRep = nodecg.Replicant('activeMode');
   const stageNamesRep = nodecg.Replicant('stageNames');
   const inGameNamesRep = nodecg.Replicant('inGameNames');
+  const castCandidatesRep = nodecg.Replicant('castCandidates');
+  const castMembersRep = nodecg.Replicant('castMembers');
 
   const gasEndpointUrl = process.env['GAS_ENDPOINT_URL'];
   gasEndpointConfiguredRep.value = !!gasEndpointUrl;
@@ -68,6 +72,13 @@ export default (nodecg: NodeCG) => {
   // ゲーム内名前対応表は常に CSV から初期化（編集後も再起動で CSV に戻す）。
   inGameNamesRep.value = loadInGameNamesFromCsv();
   log.info(`Loaded in-game names: ${Object.keys(inGameNamesRep.value ?? {}).length} entries`);
+
+  castCandidatesRep.value = loadCastCandidates();
+  log.info(
+    `[cast] cast=${castCandidatesRep.value?.cast.length ?? 0}, ` +
+    `operator=${castCandidatesRep.value?.operator.length ?? 0}, ` +
+    `observer=${castCandidatesRep.value?.observer.length ?? 0}`
+  );
 
   const getScreenshotAbsDir = () =>
     path.resolve(process.cwd(), 'data/screenshots');
@@ -398,6 +409,62 @@ export default (nodecg: NodeCG) => {
     });
   });
 
+  // POST /upload-cast-json  (body: UTF-8 JSON text, Content-Type: text/plain)
+  const MAX_CAST_JSON_BYTES = 1 * 1024 * 1024;
+
+  nodecg.mount('/upload-cast-json', (req, res) => {
+    if (req.method !== 'POST') {
+      res.status(405).end();
+      return;
+    }
+
+    let totalBytes = 0;
+    let oversized = false;
+    const chunks: Buffer[] = [];
+
+    req.on('data', (chunk: Buffer) => {
+      totalBytes += chunk.length;
+      if (totalBytes > MAX_CAST_JSON_BYTES) {
+        if (!oversized) {
+          oversized = true;
+          res.status(413).json({ error: 'payload too large' });
+          req.destroy();
+        }
+        return;
+      }
+      chunks.push(chunk);
+    });
+
+    req.on('end', () => {
+      if (oversized) return;
+
+      const jsonText = Buffer.concat(chunks).toString('utf-8');
+      if (!jsonText.trim()) {
+        res.status(400).json({ error: 'empty body' });
+        return;
+      }
+
+      let loaded;
+      try {
+        loaded = castCandidatesSchema.parse(JSON.parse(jsonText));
+      } catch (e) {
+        log.error('[upload-cast-json] JSON パース失敗', e);
+        res.status(400).json({ error: 'invalid JSON' });
+        return;
+      }
+
+      castCandidatesRep.value = loaded;
+      log.info(
+        `[upload-cast-json] cast=${loaded.cast.length}, operator=${loaded.operator.length}, observer=${loaded.observer.length}`
+      );
+      res.status(200).json({ cast: loaded.cast.length, operator: loaded.operator.length, observer: loaded.observer.length });
+    });
+
+    req.on('error', (e) => {
+      log.error('[upload-cast-json] リクエストエラー', e);
+    });
+  });
+
   // ── Message ハンドラ ───────────────────────────────────
 
   nodecg.listenFor('reloadTeamsCsv', (_data, ack) => {
@@ -636,6 +703,17 @@ export default (nodecg: NodeCG) => {
     };
     const cur = matchCandidatesRep.value ?? { turfWar: [], splatZones: [] };
     matchCandidatesRep.value = pushToQueue(cur, mode, candidate);
+    if (ack && !ack.handled) ack(null);
+  });
+
+  nodecg.listenFor('reloadCastJson', (_data, ack) => {
+    castCandidatesRep.value = loadCastCandidates();
+    log.info('[cast] data/cast.json を再読み込みしました');
+    if (ack && !ack.handled) ack(null);
+  });
+
+  nodecg.listenFor('setCastMembers', (data, ack) => {
+    castMembersRep.value = data;
     if (ack && !ack.handled) ack(null);
   });
 

@@ -1,0 +1,22 @@
+/* cast-replay.html 専用配置 (画面やや左下に実況・解説、右側やや中央より下に配信・オブザーバー) */
+/* 細かい数値は後で手動調整してください */
+
+.cast-layout--replay .role--announcer {
+  bottom: 180px;
+  left: 60px;
+}
+
+.cast-layout--replay .role--commentator {
+  bottom: 180px;
+  left: 540px;
+}
+
+.cast-layout--replay .role--operator {
+  bottom: 300px;
+  right: 60px;
+}
+
+.cast-layout--replay .role--observer {
+  bottom: 220px;
+  right: 60px;
+}

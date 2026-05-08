@@ -1,4 +1,4 @@
-import type { ActiveMode, Team } from '../schemas';
+import type { ActiveMode, Team, CastMembers } from '../schemas';
 
 export type Mode = ActiveMode;
 export type Side = 'alpha' | 'bravo';
@@ -53,4 +53,11 @@ export type MessageMap = {
 
   /** 1 プレイヤーのゲーム内名前を設定（inGameNames Replicant を更新） */
   setInGameName: { data: { playerName: string; inGameName: string } };
+
+  /** data/cast.json から castCandidates を再読み込み */
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- ts-nodecg の規約：データなしメッセージは {} で表現
+  reloadCastJson: {};
+
+  /** 4 役職の担当者名をまとめて適用 */
+  setCastMembers: { data: CastMembers };
 };

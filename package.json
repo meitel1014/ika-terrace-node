@@ -62,6 +62,20 @@
         "file": "settings-google-sheet.html",
         "workspace": "設定",
         "width": 4
+      },
+      {
+        "name": "settings-cast-upload",
+        "title": "設定｜担当者リスト読込",
+        "file": "settings-cast-upload.html",
+        "workspace": "設定",
+        "width": 4
+      },
+      {
+        "name": "cast-control",
+        "title": "実況・解説 担当者",
+        "file": "cast-control.html",
+        "workspace": "caster",
+        "width": 6
       }
     ],
     "graphics": [
@@ -79,6 +93,16 @@
         "file": "champions.html",
         "width": 1920,
         "height": 1080
+      },
+      {
+        "file": "cast.html",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "file": "cast-replay.html",
+        "width": 1920,
+        "height": 1080
       }
     ]
   },
@@ -93,7 +117,8 @@
     "rollup": "^4.53.3",
     "rollup-plugin-esbuild": "^6.2.1",
     "rollup-plugin-node-externals": "^8.1.2",
-    "sharp": "^0.34.5"
+    "sharp": "^0.34.5",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
@@ -113,7 +138,6 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4",
-    "zod": "^3.23.8",
     "zod-to-json-schema": "^3.23.5"
   }
 }
