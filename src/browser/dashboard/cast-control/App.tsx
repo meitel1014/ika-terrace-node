@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useReplicant } from '@/browser/hooks/useReplicant';
 import { type Status } from '../_shared/useReloadButton';
 import type { CastMembers } from '@/schemas';
@@ -19,95 +19,6 @@ function applyLabel(isDirty: boolean, status: Status): string {
   if (status === 'done') return '適用完了';
   if (status === 'error') return '適用失敗';
   return isDirty ? '適用 *' : '適用';
-}
-
-type ComboFieldProps = {
-  id: string;
-  label: string;
-  candidates: string[];
-  value: string;
-  onChange: (v: string) => void;
-};
-
-function ComboField({ id, label, candidates, value, onChange }: ComboFieldProps) {
-  const [open, setOpen] = useState(false);
-  const [activeIdx, setActiveIdx] = useState(-1);
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  // ドロップダウン外クリックで閉じる
-  useEffect(() => {
-    const onDown = (e: MouseEvent) => {
-      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('mousedown', onDown);
-    return () => document.removeEventListener('mousedown', onDown);
-  }, []);
-
-  const openDropdown = () => {
-    setOpen(true);
-    setActiveIdx(-1);
-  };
-
-  const selectCandidate = (name: string) => {
-    onChange(name);
-    setOpen(false);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!open) {
-      if (e.key === 'ArrowDown' || e.key === 'Enter') openDropdown();
-      return;
-    }
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setActiveIdx((i) => Math.min(i + 1, candidates.length - 1));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setActiveIdx((i) => Math.max(i - 1, -1));
-    } else if (e.key === 'Enter' && activeIdx >= 0) {
-      e.preventDefault();
-      selectCandidate(candidates[activeIdx]);
-    } else if (e.key === 'Escape') {
-      setOpen(false);
-    }
-  };
-
-  return (
-    <div className="field">
-      <label htmlFor={id}>{label}</label>
-      <div ref={wrapRef} className="combobox-wrap">
-        <input
-          ref={inputRef}
-          id={id}
-          type="text"
-          className="combobox-input"
-          value={value}
-          onFocus={openDropdown}
-          onChange={(e) => { onChange(e.target.value); setOpen(true); }}
-          onKeyDown={handleKeyDown}
-          autoComplete="off"
-        />
-        <span className="combobox-arrow">▼</span>
-        {open && candidates.length > 0 && (
-          <ul className="combobox-dropdown">
-            {candidates.map((name, i) => (
-              <li
-                key={name}
-                data-active={i === activeIdx ? 'true' : undefined}
-                onMouseDown={(e) => {
-                  e.preventDefault(); // input の blur を防ぐ
-                  selectCandidate(name);
-                }}
-              >
-                {name}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </div>
-  );
 }
 
 export function CastControlPanel() {
@@ -139,16 +50,24 @@ export function CastControlPanel() {
 
   return (
     <div className="cast-control-panel" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-      {FIELDS.map(({ key, label, candidatesKey }) => (
-        <ComboField
-          key={key}
-          id={`cast-field-${key}`}
-          label={label}
-          candidates={candidates?.[candidatesKey] ?? []}
-          value={local[key]}
-          onChange={(v) => setField(key, v)}
-        />
-      ))}
+      {FIELDS.map(({ key, label, candidatesKey }) => {
+        const opts = candidates?.[candidatesKey] ?? [];
+        return (
+          <div key={key} className="field">
+            <label htmlFor={`cast-field-${key}`}>{label}</label>
+            <select
+              id={`cast-field-${key}`}
+              value={local[key]}
+              onChange={(e) => setField(key, e.target.value)}
+            >
+              <option value="">-- 選択してください --</option>
+              {opts.map((name) => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
+          </div>
+        );
+      })}
 
       <div style={{ display: 'flex', gap: '8px' }}>
         <button
