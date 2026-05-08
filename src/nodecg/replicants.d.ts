@@ -10,6 +10,8 @@ import type {
   GasEndpointConfigured,
   StageNames,
   InGameNames,
+  CastCandidates,
+  CastMembers,
 } from '../schemas';
 
 /**
@@ -27,4 +29,6 @@ export type ReplicantMap = {
   gasEndpointConfigured: GasEndpointConfigured;
   stageNames: StageNames;
   inGameNames: InGameNames;
+  castCandidates: CastCandidates;
+  castMembers: CastMembers;
 };

@@ -1,0 +1,22 @@
+/* cast.html 専用配置 (画面やや下中央に実況・解説、右上に配信・オブザーバー) */
+/* 細かい数値は後で手動調整してください */
+
+.cast-layout--main .role--announcer {
+  bottom: 180px;
+  left: 480px;
+}
+
+.cast-layout--main .role--commentator {
+  bottom: 180px;
+  left: 960px;
+}
+
+.cast-layout--main .role--operator {
+  top: 60px;
+  right: 60px;
+}
+
+.cast-layout--main .role--observer {
+  top: 140px;
+  right: 60px;
+}

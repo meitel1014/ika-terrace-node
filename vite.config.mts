@@ -13,6 +13,16 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      // src/schemas/* が zod を import するが、フロントエンドでは型のみ使用する。
+      // Rollup が resolve できない旨の UNRESOLVED_IMPORT 警告を抑制する。
+      onwarn(warning, warn) {
+        if (warning.code === 'UNRESOLVED_IMPORT' && warning.exporter === 'zod') return;
+        warn(warning);
+      },
+    },
+  },
   plugins: [
     react(),
     nodecg({
@@ -22,6 +32,10 @@ export default defineConfig({
       extension: {
         input: './src/extension/index.ts',
         plugins: [rollupEsbuild(), rollupExternals()],
+        onwarn(warning, warn) {
+          if (warning.code === 'UNRESOLVED_IMPORT' && warning.exporter === 'zod') return;
+          warn(warning);
+        },
       },
     }),
     nodecgSchemas(),

@@ -1,0 +1,19 @@
+/* cast graphic 共通: コンテナ・役職ごとの枠スタイル */
+
+.cast-graphic {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+}
+
+.role {
+  position: absolute;
+}
+
+/* 名前表示枠: 幅・フォントサイズは後で CSS を手動調整 */
+.role .justify-name {
+  width: 6em;
+  font-size: 64px;
+  line-height: 1.2;
+}

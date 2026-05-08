@@ -34,3 +34,9 @@ export type { StageNames } from './stageNames';
 
 export { inGameNamesSchema } from './inGameNames';
 export type { InGameNames } from './inGameNames';
+
+export { castCandidatesSchema } from './castCandidates';
+export type { CastCandidates } from './castCandidates';
+
+export { castMembersSchema } from './castMembers';
+export type { CastMembers } from './castMembers';

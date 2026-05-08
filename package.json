@@ -62,6 +62,20 @@
         "file": "settings-google-sheet.html",
         "workspace": "設定",
         "width": 4
+      },
+      {
+        "name": "settings-cast-upload",
+        "title": "設定｜担当者リスト読込",
+        "file": "settings-cast-upload.html",
+        "workspace": "設定",
+        "width": 4
+      },
+      {
+        "name": "cast-control",
+        "title": "実況・解説 担当者",
+        "file": "cast-control.html",
+        "workspace": "caster",
+        "width": 6
       }
     ],
     "graphics": [
@@ -77,6 +91,16 @@
       },
       {
         "file": "champions.html",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "file": "cast.html",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "file": "cast-replay.html",
         "width": 1920,
         "height": 1080
       }
