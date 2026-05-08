@@ -71,6 +71,7 @@ type PluginConfig = {
   dashboard?: string | string[];
   extension?: string | RollupOptions;
   template?: string | { graphics: string; dashboard: string };
+  typekitKitId?: string;
   server?: {
     host?: string;
     port?: number;
@@ -83,6 +84,7 @@ export default async ({
   dashboard = [],
   extension,
   template = './src/template.html',
+  typekitKitId = '',
   server,
 }: PluginConfig): Promise<Plugin> => {
   let config: ResolvedConfig;
@@ -184,9 +186,10 @@ export default async ({
         }
       }
 
-      const newHtml = templateHtml.includes('</head>')
-        ? templateHtml.replace('</head>', `${head.join('\n')}\n</head>`)
-        : `${head.join('\n')}\n${templateHtml}`;
+      const resolvedTemplate = templateHtml.replace('%%TYPEKIT_KIT_ID%%', typekitKitId);
+      const newHtml = resolvedTemplate.includes('</head>')
+        ? resolvedTemplate.replace('</head>', `${head.join('\n')}\n</head>`)
+        : `${head.join('\n')}\n${resolvedTemplate}`;
       const basename = path.basename(input, path.extname(input));
       const name = basename === 'index'
         ? path.basename(path.dirname(input))
