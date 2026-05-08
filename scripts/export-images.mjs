@@ -32,6 +32,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
+import 'dotenv/config';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -196,7 +197,7 @@ function buildSvgFilter(id, color, opacity, dilate, dx, dy, blur) {
     </filter>`;
 }
 
-// Typekit kit ID の参照元: src/template.html
+// Typekit kit ID は .env の TYPEKIT_KIT_ID から取得（src/template.html と同じ値を使う）
 // pageHeight: html/body をこの高さで固定し、NodeCG ページと同じ containing block を再現する
 // CSS 内の @import は <style> の先頭でなければならないため行単位で抽出して先頭に置く
 function buildHead(cssText, pageHeight) {
@@ -215,7 +216,7 @@ function buildHead(cssText, pageHeight) {
   return `<head>
 <meta charset="UTF-8">
 <script>(function(d){
-  var config={kitId:'cuj4ylh',scriptTimeout:8000,async:true},
+  var config={kitId:'${process.env.TYPEKIT_KIT_ID ?? ''}',scriptTimeout:8000,async:true},
   h=d.documentElement,
   t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),
   tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;
