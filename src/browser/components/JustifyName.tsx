@@ -9,7 +9,7 @@ type Props = {
  * - 短い名前: text-align-last:justify で枠内両端揃え
  * - 長い名前: 枠をはみ出す場合のみ scaleX で横方向だけ圧縮（縦サイズ維持）
  */
-export function JustifyName({ name, style, ...rest }: Props) {
+export function JustifyName({ name, style, className, ...rest }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLSpanElement>(null);
   const [scaleX, setScaleX] = useState(1);
@@ -34,9 +34,9 @@ export function JustifyName({ name, style, ...rest }: Props) {
   return (
     <div
       ref={containerRef}
+      className={`justify-name${className ? ` ${className}` : ''}`}
       style={{
-        textAlign: 'justify',
-        textAlignLast: 'justify',
+        textAlign: 'center',
         overflow: 'hidden',
         ...style,
       }}
@@ -45,10 +45,10 @@ export function JustifyName({ name, style, ...rest }: Props) {
       <span
         ref={innerRef}
         style={{
-          display: 'inline-block',
+          display: 'block',
           whiteSpace: 'nowrap',
           transform: `scaleX(${scaleX})`,
-          transformOrigin: 'left top',
+          transformOrigin: 'left center',
         }}
       >
         {name}

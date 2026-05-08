@@ -2,21 +2,29 @@
 /* 細かい数値は後で手動調整してください */
 
 .cast-layout--main .role--announcer {
-  bottom: 180px;
-  left: 480px;
+  width: 350px;
+  bottom: 325px;
+  left: 550px;
+  font-size: 80px;
 }
 
 .cast-layout--main .role--commentator {
-  bottom: 180px;
-  left: 960px;
+  width: 350px;
+  bottom: 325px;
+  left: 1070px;
+  font-size: 80px;
 }
 
 .cast-layout--main .role--operator {
-  top: 60px;
-  right: 60px;
+  width: 200px;
+  top: 30px;
+  right: 45px;
+  font-size: 50px;
 }
 
 .cast-layout--main .role--observer {
-  top: 140px;
-  right: 60px;
+  width: 200px;
+  top: 110px;
+  right: 45px;
+  font-size: 50px;
 }

@@ -1,6 +1,7 @@
 /* cast graphic 共通: コンテナ・役職ごとの枠スタイル */
 
 .cast-graphic {
+  font-family: "ab-don", sans-serif;
   position: relative;
   width: 1920px;
   height: 1080px;
@@ -13,7 +14,4 @@
 
 /* 名前表示枠: 幅・フォントサイズは後で CSS を手動調整 */
 .role .justify-name {
-  width: 6em;
-  font-size: 64px;
-  line-height: 1.2;
 }
