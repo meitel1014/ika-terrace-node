@@ -11,7 +11,7 @@
 - CSS は `index.tsx` で `@/browser/global.css` と `../_shared/dashboard.css` をインポートして共用する。個別の `style.css` は原則作成しない
 
 既存パネルの参考:
-- `_shared/` 利用例: `src/browser/dashboard/turf-war-buttons/index.tsx`
+- `_shared/` 利用例: `src/browser/dashboard/battle-buttons/index.tsx`
 - 独立パネル例: `src/browser/dashboard/settings-csv-reload/index.tsx` + `App.tsx`
 
 作業開始前に、workspace 名・パネルタイトル・横幅（1〜8）をユーザーに確認してください。
