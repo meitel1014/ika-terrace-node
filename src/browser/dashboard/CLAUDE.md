@@ -9,6 +9,8 @@
 | Result | `result` | 判定結果 | fullbleed |
 | 設定 | `settings-csv-reload` | 設定｜CSV 再読込 | 4 |
 | 設定 | `settings-google-sheet` | 設定｜Google スプレッドシート同期 | 4 |
+| 設定 | `settings-cast-upload` | 設定｜担当者リスト読込 | 4 |
+| caster | `cast-control` | 実況・解説 担当者 | 6 |
 
 `mode-select` パネルに ナワバリ/エリア 切り替えボタンを配置。切り替えは `activeMode` Replicant に書き込む。他のパネルは `activeMode` を読み取り、`_shared/` コンポーネントに `mode` プロップとして渡す。
 
