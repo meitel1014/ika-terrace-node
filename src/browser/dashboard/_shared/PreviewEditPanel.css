@@ -117,6 +117,10 @@
   padding-bottom: 4px;
 }
 
+.preview-ingame-row td .field-value {
+  font-size: 14px;
+}
+
 .preview-ingame-row {
   border-top: none !important;
 }
