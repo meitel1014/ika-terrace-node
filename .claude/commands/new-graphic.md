@@ -10,7 +10,7 @@
 - `App.tsx` や個別の `style.css` は原則作成しない
 
 既存グラフィックの参考:
-- `src/browser/graphics/turf-war-under/index.tsx`（under パターン）
-- `src/browser/graphics/turf-war-side/index.tsx`（side パターン）
+- `src/browser/graphics/under/index.tsx`（under パターン）
+- `src/browser/graphics/side/index.tsx`（side パターン）
 
 作業開始前に、under（配信画面下部）か side（会場左右分割）か、および対応 mode（`turfWar` / `splatZones`）をユーザーに確認してください。

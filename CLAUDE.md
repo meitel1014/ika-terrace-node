@@ -147,7 +147,7 @@ CSV 読み込み直後は `viewname === name`。Graphic 以外で `team.viewname
 │   │   ├── dashboard/
 │   │   │   ├── _shared/             # ナワバリ/エリア共通パネルコンポーネント
 │   │   │   ├── mode-select/         # Battle Workspace: モード切替
-│   │   │   ├── turf-war-*/          # Battle Workspace パネル (3つ・ナワバリ/エリア共通実装)
+│   │   │   ├── battle-*/            # Battle Workspace パネル (3つ・ナワバリ/エリア共通実装)
 │   │   │   ├── result/              # 判定結果 Workspace (fullbleed)
 │   │   │   ├── cast-control/        # caster Workspace: 実況・解説担当者選択
 │   │   │   ├── settings-csv-reload/ # CSV 再読込パネル

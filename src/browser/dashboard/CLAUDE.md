@@ -3,9 +3,9 @@
 | Workspace | パネル | 表示名 | 幅 |
 |---|---|---|---|
 | Battle | `mode-select` | モード切替 | 4 |
-| Battle | `turf-war-team-select` | チーム選択 | 4 |
-| Battle | `turf-war-buttons` | 表示操作 | 4 |
-| Battle | `turf-war-preview` | プレビュー編集 | 8 |
+| Battle | `battle-team-select` | チーム選択 | 4 |
+| Battle | `battle-buttons` | 表示操作 | 4 |
+| Battle | `battle-preview` | プレビュー編集 | 8 |
 | Result | `result` | 判定結果 | fullbleed |
 | 設定 | `settings-csv-reload` | 設定｜CSV 再読込 | 4 |
 | 設定 | `settings-google-sheet` | 設定｜Google スプレッドシート同期 | 4 |
