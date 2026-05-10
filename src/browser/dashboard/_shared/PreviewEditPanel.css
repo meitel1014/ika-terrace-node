@@ -14,7 +14,7 @@
 }
 
 .preview-col-action {
-  width: 10%;
+  width: 17%;
 }
 
 .preview-col-spacer {
@@ -115,6 +115,10 @@
 .preview-ingame-row td {
   padding-top: 2px;
   padding-bottom: 4px;
+}
+
+.preview-ingame-row td .field-value {
+  font-size: 14px;
 }
 
 .preview-ingame-row {
