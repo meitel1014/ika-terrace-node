@@ -17,7 +17,9 @@ cd dezifes-node
 
 #### Git がない場合
 
-1. リポジトリの ZIP をダウンロードして展開
+1. リポジトリの ZIP をダウンロードして展開（画面右上の「<> Code」→「Download ZIP」）
+<img width="400" alt="image" src="https://github.com/user-attachments/assets/ef9b37c6-9a9c-4a6e-934f-3fbf5e231de7" />
+
 2. PowerShell で展開先のフォルダに移動
 
 ```powershell
