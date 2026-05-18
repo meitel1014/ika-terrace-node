@@ -74,6 +74,8 @@ pnpm build
 npx nodecg start
 ```
 
+ダウンロードして展開したフォルダ内の `start.bat` をダブルクリックして実行することでも起動できます。
+
 起動後、ブラウザで http://localhost:9090 にアクセスします。
 
 ### 8. OBS への取り込み
