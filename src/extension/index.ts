@@ -80,8 +80,11 @@ export default (nodecg: NodeCG) => {
     `observer=${castCandidatesRep.value?.observer.length ?? 0}`
   );
 
-  const getScreenshotAbsDir = () =>
-    path.resolve(process.cwd(), 'data/screenshots');
+  const getScreenshotAbsDir = () => {
+    const dir = path.resolve(process.cwd(), 'data/screenshots');
+    fs.mkdirSync(path.join(dir, 'annotated'), { recursive: true });
+    return dir;
+  };
 
   // NodeCG の HTTP listen 完了後にブキ・ステージテンプレートを事前ロード。
   setImmediate(() => {
