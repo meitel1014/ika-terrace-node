@@ -61,6 +61,9 @@ corepack enable
 
 ```powershell
 pnpm install
+```
+
+```powershell
 pnpm approve-builds
 ```
 
