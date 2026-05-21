@@ -54,6 +54,7 @@ corepack enable
 
 ```powershell
 pnpm install
+pnpm approve-builds
 ```
 
 初回は数分かかります。
