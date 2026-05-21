@@ -26,8 +26,9 @@ cd dezifes-node
 cd C:\Users\<ユーザー名>\Downloads\dezifes-node
 ```
 
-### 2. Node.js のインストール
+### 2. Node.js と git のインストール
 
+Node.js
 1. https://nodejs.org/ にアクセスし、**v24 LTS**（推奨版）のインストーラーをダウンロード
 2. インストーラーを実行（設定はすべてデフォルトのまま「Next」で OK）
 3. インストール完了後、**PowerShell** を開いて以下を実行し、バージョンが表示されれば成功
@@ -36,6 +37,12 @@ cd C:\Users\<ユーザー名>\Downloads\dezifes-node
 node -v
 # v24.x.x と表示されれば OK
 ```
+
+git
+1. https://git-scm.com/install/windows にアクセスし、インストーラーをダウンロード
+2. インストーラーを実行
+インストール中、「Windows Explorer Extension」のチェックを外すこと
+その他の設定はすべてデフォルトのまま「Next」で OK
 
 ### 3. pnpm の有効化
 
