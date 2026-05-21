@@ -11,7 +11,7 @@
 #### Git がインストール済みの場合
 
 ```powershell
-git clone <このリポジトリのURL>
+git clone git@github.com:meitel1014/dezifes-node.git
 cd dezifes-node
 ```
 
