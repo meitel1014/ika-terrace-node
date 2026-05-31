@@ -6,10 +6,15 @@ import { useReplicant } from '@/browser/hooks/useReplicant';
 
 function App() {
   const [activeMode, setActiveMode] = useReplicant('activeMode');
+  const [selection] = useReplicant('selection');
   if (activeMode === undefined) return null;
 
   const switchMode = (next: typeof activeMode) => {
     if (next === activeMode) return;
+    const slot = selection?.[activeMode];
+    if (slot?.alpha != null || slot?.bravo != null) {
+      if (!window.confirm('モードを切り替えるとチーム選択がリセットされます。本当に切り替えますか？')) return;
+    }
     void nodecg.sendMessage('resetMode', { mode: activeMode });
     setActiveMode(next);
   };
