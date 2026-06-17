@@ -12,6 +12,6 @@
   position: absolute;
 }
 
-/* 名前表示枠: 幅・フォントサイズは後で CSS を手動調整 */
-.role .justify-name {
+.role-label {
+  position: absolute;
 }

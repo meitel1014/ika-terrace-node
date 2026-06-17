@@ -4,27 +4,41 @@
 .cast-layout--main .role--announcer {
   width: 350px;
   bottom: 325px;
-  left: 550px;
+  left: 495px;
   font-size: 80px;
 }
 
 .cast-layout--main .role--commentator {
   width: 350px;
   bottom: 325px;
-  left: 1070px;
+  left: 1125px;
   font-size: 80px;
 }
 
+.cast-layout--main .role-label--operator {
+  width: 90px;
+  top: 54px;
+  right: 250px;
+  font-size: 40px;
+}
+
+.cast-layout--main .role-label--observer {
+  width: 218px;
+  top: 142px;
+  right: 250px;
+  font-size: 40px;
+}
+
 .cast-layout--main .role--operator {
-  width: 200px;
-  top: 30px;
-  right: 45px;
+  width: 220px;
+  top: 54px;
+  right: 36px;
   font-size: 50px;
 }
 
 .cast-layout--main .role--observer {
-  width: 200px;
-  top: 110px;
-  right: 45px;
+  width: 220px;
+  top: 142px;
+  right: 36px;
   font-size: 50px;
 }

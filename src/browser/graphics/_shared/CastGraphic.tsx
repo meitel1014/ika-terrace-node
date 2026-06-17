@@ -25,8 +25,14 @@ export function CastGraphic({ layoutClass }: Props) {
       <div className="role role--commentator">
         <JustifyName name={m.commentator} />
       </div>
+      <div className="role-label role-label--operator">
+        <JustifyName name="配信：" />
+      </div>
       <div className="role role--operator">
         <JustifyName name={m.operator} />
+      </div>
+      <div className="role-label role-label--observer">
+        <JustifyName name="オブザーバー：" />
       </div>
       <div className="role role--observer">
         <JustifyName name={m.observer} />
