@@ -12,6 +12,10 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   return {
+    server: {
+      port: 8080,
+      strictPort: true,
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
