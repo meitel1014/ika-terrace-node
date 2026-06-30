@@ -1,23 +1,18 @@
 import './TeamSelectPanel.css';
 import { useReplicant } from '../../hooks/useReplicant';
 import { stripHtml } from '../../utils/stripHtml';
-import type { Mode, Side } from '@/nodecg/messages';
+import type { Side } from '@/nodecg/messages';
 
-type Props = { mode: Mode };
-
-export function TeamSelectPanel({ mode }: Props) {
+export function TeamSelectPanel() {
   const [teamsPool] = useReplicant('teamsPool');
   const [selection, setSelection] = useReplicant('selection');
 
   if (!teamsPool || !selection) return <p>読み込み中…</p>;
 
-  const teams = teamsPool[mode];
-  const slot = selection[mode];
-
   const handleChange = (side: Side, teamId: string) => {
     setSelection({
       ...selection,
-      [mode]: { ...slot, [side]: teamId || null },
+      [side]: teamId || null,
     });
   };
 
@@ -26,11 +21,11 @@ export function TeamSelectPanel({ mode }: Props) {
       <div className="field field-alpha">
         <label>アルファチーム</label>
         <select
-          value={slot.alpha ?? ''}
+          value={selection.alpha ?? ''}
           onChange={(e) => handleChange('alpha', e.target.value)}
         >
           <option value="">-- 選択してください --</option>
-          {teams.map((t) => (
+          {teamsPool.map((t) => (
             <option key={t.id} value={t.id}>
               {stripHtml(t.name)}
             </option>
@@ -41,11 +36,11 @@ export function TeamSelectPanel({ mode }: Props) {
       <div className="field field-bravo">
         <label>ブラボーチーム</label>
         <select
-          value={slot.bravo ?? ''}
+          value={selection.bravo ?? ''}
           onChange={(e) => handleChange('bravo', e.target.value)}
         >
           <option value="">-- 選択してください --</option>
-          {teams.map((t) => (
+          {teamsPool.map((t) => (
             <option key={t.id} value={t.id}>
               {stripHtml(t.name)}
             </option>

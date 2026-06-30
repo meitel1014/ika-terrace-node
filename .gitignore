@@ -37,7 +37,7 @@ db
 data/*
 !data/CLAUDE.md
 
-plan*.txt
+plan*
 .env
 
 # 画像エクスポート出力（export-images スクリプトの生成物）

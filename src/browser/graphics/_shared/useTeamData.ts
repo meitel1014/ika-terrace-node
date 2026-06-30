@@ -1,23 +1,16 @@
 import { useReplicant } from '../../hooks/useReplicant';
-import type { Mode, Side } from '@/nodecg/messages';
+import type { Side } from '@/nodecg/messages';
 import type { Team } from '@/schemas';
 
-/**
- * 指定モード・サイドのチームデータと表示状態を返す。
- */
-export function useTeamData(mode: Mode, side: Side): {
-  team: Team | null;
-  visible: boolean;
-} {
+/** 指定サイドのチームデータを返す。 */
+export function useTeamData(side: Side): { team: Team | null } {
   const [teamsPool] = useReplicant('teamsPool');
   const [selection] = useReplicant('selection');
-  const [visibility] = useReplicant('visibility');
 
-  const teamId = selection?.[mode]?.[side] ?? null;
+  const teamId = selection?.[side] ?? null;
   const team = teamId
-    ? teamsPool?.[mode]?.find((t) => t.id === teamId) ?? null
+    ? teamsPool?.find((t) => t.id === teamId) ?? null
     : null;
-  const visible = visibility?.[mode]?.[side] ?? false;
 
-  return { team, visible };
+  return { team };
 }

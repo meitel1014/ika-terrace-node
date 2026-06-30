@@ -1,9 +1,6 @@
-import { useFadeVisible } from '../../hooks/useFadeVisible';
 import { useTeamData } from './useTeamData';
 import { ShadowFilters } from './ShadowFilters';
-import type { Mode, Side } from '@/nodecg/messages';
-
-type Props = { mode: Mode };
+import type { Side } from '@/nodecg/messages';
 
 const SHADOW = {
   color: 'rgb(43, 43, 43)',
@@ -14,17 +11,16 @@ const SHADOW = {
   blur: 2,
 } as const;
 
-function TeamSlot({ mode, side }: { mode: Mode; side: Side }) {
-  const { team, visible } = useTeamData(mode, side);
-  const fadeStyle = useFadeVisible(visible);
+function TeamSlot({ side }: { side: Side }) {
+  const { team } = useTeamData(side);
 
   return (
-    <div className={`under-slot under-${side}`} style={fadeStyle}>
+    <div className={`under-slot under-${side}`}>
       {team && (
         <>
           <div className="under-team-name">{team.name}</div>
           <div className="under-players">
-            {team.players.join('\u3000')}
+            {team.players.join('　')}
           </div>
         </>
       )}
@@ -32,12 +28,12 @@ function TeamSlot({ mode, side }: { mode: Mode; side: Side }) {
   );
 }
 
-export function UnderGraphic({ mode }: Props) {
+export function UnderGraphic() {
   return (
     <div className="under-container">
       <ShadowFilters shadow={SHADOW} />
-      <TeamSlot mode={mode} side="alpha" />
-      <TeamSlot mode={mode} side="bravo" />
+      <TeamSlot side="alpha" />
+      <TeamSlot side="bravo" />
     </div>
   );
 }

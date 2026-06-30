@@ -5,11 +5,6 @@ import type { TeamsPool, Team } from '../schemas';
 
 const CSV_PATH = path.resolve(process.cwd(), 'data/teams.csv');
 
-const MODE_LABEL_TO_KEY: Record<string, 'turfWar' | 'splatZones'> = {
-  ナワバリトーナメント: 'turfWar',
-  エリアトーナメント: 'splatZones',
-};
-
 /**
  * 半角数字 / 全角数字 / 丸数字のいずれかを列名に含む列のインデックスを返す。
  * 申請フォームによる表記揺れに対応するため柔軟に検出する。
@@ -33,16 +28,14 @@ function findPlayerColumnIndex(header: string[], playerNum: 0 | 1 | 2 | 3): numb
 export function parseTeamsPoolFromCsvText(raw: string): TeamsPool {
   const rows = parseCsv(raw);
   if (rows.length === 0) {
-    return { turfWar: [], splatZones: [] };
+    return [];
   }
 
   const header = rows[0].map((h) => h.trim());
 
   const idx = {
-    mode:     header.indexOf('ルール'),
     name:     header.indexOf('チーム名'),
     viewname: header.indexOf('チーム名(表示用)'),
-    alias:    header.indexOf('二つ名'),
     players: [
       findPlayerColumnIndex(header, 0),
       findPlayerColumnIndex(header, 1),
@@ -51,8 +44,7 @@ export function parseTeamsPoolFromCsvText(raw: string): TeamsPool {
     ] as [number, number, number, number],
   };
 
-  const noRuleColumn = idx.mode < 0;
-  const pool: TeamsPool = { turfWar: [], splatZones: [] };
+  const pool: TeamsPool = [];
   let serial = 0;
 
   for (const row of rows.slice(1)) {
@@ -66,7 +58,6 @@ export function parseTeamsPoolFromCsvText(raw: string): TeamsPool {
       id:       String(serial),
       name:     rawName,
       viewname: rawViewname || rawName,
-      alias:    idx.alias >= 0 ? (row[idx.alias] ?? '').trim() : '',
       players: [
         idx.players[0] >= 0 ? (row[idx.players[0]] ?? '').trim() : '',
         idx.players[1] >= 0 ? (row[idx.players[1]] ?? '').trim() : '',
@@ -75,16 +66,7 @@ export function parseTeamsPoolFromCsvText(raw: string): TeamsPool {
       ],
     };
 
-    if (noRuleColumn) {
-      pool.turfWar.push(team);
-      pool.splatZones.push(team);
-    } else {
-      const modeLabel = (row[idx.mode] ?? '').trim();
-      const modeKey = MODE_LABEL_TO_KEY[modeLabel];
-      if (modeKey) {
-        pool[modeKey].push(team);
-      }
-    }
+    pool.push(team);
   }
 
   return pool;
@@ -93,12 +75,12 @@ export function parseTeamsPoolFromCsvText(raw: string): TeamsPool {
 /** data/teams.csv を読んで TeamsPool を構築する。ファイルが存在しない場合は空を返す。 */
 export function loadTeamsPoolFromCsv(): TeamsPool {
   if (!fs.existsSync(CSV_PATH)) {
-    return { turfWar: [], splatZones: [] };
+    return [];
   }
   try {
     return parseTeamsPoolFromCsvText(fs.readFileSync(CSV_PATH, 'utf-8'));
   } catch (e) {
     console.error(`[loadTeams] Failed to read ${CSV_PATH}:`, e);
-    return { turfWar: [], splatZones: [] };
+    return [];
   }
 }

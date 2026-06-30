@@ -1,11 +1,7 @@
-import { Html } from '../../components/Html';
 import { FitText } from '../../components/FitText';
-import { useFadeVisible } from '../../hooks/useFadeVisible';
 import { useTeamData } from './useTeamData';
 import { ShadowFilters } from './ShadowFilters';
-import type { Mode, Side } from '@/nodecg/messages';
-
-type Props = { mode: Mode };
+import type { Side } from '@/nodecg/messages';
 
 const SHADOW = {
   color: 'rgb(94, 94, 94)',
@@ -16,16 +12,14 @@ const SHADOW = {
   blur: 4,
 } as const;
 
-function TeamSlot({ mode, side }: { mode: Mode; side: Side }) {
-  const { team, visible } = useTeamData(mode, side);
-  const fadeStyle = useFadeVisible(visible);
+function TeamSlot({ side }: { side: Side }) {
+  const { team } = useTeamData(side);
   const align = side === 'alpha' ? 'left' : 'right';
 
   return (
-    <div className={`side-slot side-${side}`} style={fadeStyle}>
+    <div className={`side-slot side-${side}`}>
       {team && (
         <div className="side-team-content">
-          <Html value={team.alias} as="div" className="side-alias" />
           <FitText
             html={team.viewname}
             align={align}
@@ -42,12 +36,12 @@ function TeamSlot({ mode, side }: { mode: Mode; side: Side }) {
   );
 }
 
-export function SideGraphic({ mode }: Props) {
+export function SideGraphic() {
   return (
     <div className="side-container">
       <ShadowFilters shadow={SHADOW} />
-      <TeamSlot mode={mode} side="alpha" />
-      <TeamSlot mode={mode} side="bravo" />
+      <TeamSlot side="alpha" />
+      <TeamSlot side="bravo" />
     </div>
   );
 }

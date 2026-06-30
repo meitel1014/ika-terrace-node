@@ -1,8 +1,6 @@
-import type { ActiveMode, Team, CastMembers } from '../schemas';
+import type { Team, CastMembers } from '../schemas';
 
-export type Mode = ActiveMode;
 export type Side = 'alpha' | 'bravo';
-export type PickPosition = 0 | 1 | 2 | 3;
 
 /**
  * すべてのメッセージの型を定義するマップ
@@ -12,47 +10,8 @@ export type MessageMap = {
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- ts-nodecg の規約：データなしメッセージは {} で表現
   reloadTeamsCsv: {};
 
-  /** 指定モードの アルファ/ブラボー 両方を非表示にし、選択も初期化する */
-  resetMode: { data: { mode: Mode } };
-
   /** teamsPool 内の 1 チームを ID キーで部分更新する */
-  updateTeam: { data: { mode: Mode; teamId: string; patch: Partial<Team> } };
-
-  /** 判定結果候補の 1 マスを手動修正（playerName または weaponId を差し替え） */
-  updateMatchCandidate: {
-    data: {
-      mode: Mode;
-      candidateIndex: number;
-      side: Side;
-      position: PickPosition;
-      patch: { playerName?: string; weaponId?: string };
-    };
-  };
-
-  /** 判定結果を確定し matches に追加 + CSV 追記 + キューから指定インデックスのエントリを削除 */
-  confirmMatchCandidate: { data: { mode: Mode; candidateIndex: number } };
-
-  /** 判定結果候補を破棄（matches に記録せずキューから指定インデックスのエントリを削除） */
-  dismissMatchCandidate: { data: { mode: Mode; candidateIndex: number } };
-
-  /** matches から 1 件削除 */
-  deleteMatch: { data: { id: string } };
-
-  /** 判定結果候補の勝利サイドを設定（null で解除） */
-  setMatchCandidateWonSide: {
-    data: { mode: Mode; candidateIndex: number; wonSide: Side | null };
-  };
-
-  /** 判定結果候補のステージ名を手動設定 */
-  setMatchCandidateStageName: {
-    data: { mode: Mode; candidateIndex: number; stageName: string };
-  };
-
-  /** 手動入力用の空の候補をキューに追加する */
-  addManualCandidate: { data: { mode: Mode } };
-
-  /** 1 プレイヤーのゲーム内名前を設定（inGameNames Replicant を更新） */
-  setInGameName: { data: { playerName: string; inGameName: string } };
+  updateTeam: { data: { teamId: string; patch: Partial<Team> } };
 
   /** data/cast.json から castCandidates を再読み込み */
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- ts-nodecg の規約：データなしメッセージは {} で表現

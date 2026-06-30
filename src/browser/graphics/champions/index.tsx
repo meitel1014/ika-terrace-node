@@ -1,28 +1,24 @@
 import '@/browser/global.css';
 import './champions.css';
 import { createRoot } from 'react-dom/client';
-import { useReplicant } from '@/browser/hooks/useReplicant';
-import { useFadeVisible } from '@/browser/hooks/useFadeVisible';
 import { FitText } from '@/browser/components/FitText';
 import { useTeamData } from '../_shared/useTeamData';
-import type { Mode, Side } from '@/nodecg/messages';
+import type { Side } from '@/nodecg/messages';
 
-function TeamNames({ mode }: { mode: Mode }) {
-  const alpha = useTeamData(mode, 'alpha');
-  const bravo = useTeamData(mode, 'bravo');
-  const alphaFade = useFadeVisible(alpha.visible);
-  const bravoFade = useFadeVisible(bravo.visible);
+function TeamNames() {
+  const alpha = useTeamData('alpha');
+  const bravo = useTeamData('bravo');
 
   return (
     <div className="champ-team-names">
-      <div className="champ-team-name-wrapper team-alpha" style={alphaFade}>
+      <div className="champ-team-name-wrapper team-alpha">
         <FitText
           html={alpha.team?.viewname ?? ''}
           align="left"
           className="champ-team-name"
         />
       </div>
-      <div className="champ-team-name-wrapper team-bravo" style={bravoFade}>
+      <div className="champ-team-name-wrapper team-bravo">
         <FitText
           html={bravo.team?.viewname ?? ''}
           align="left"
@@ -33,13 +29,12 @@ function TeamNames({ mode }: { mode: Mode }) {
   );
 }
 
-function PlayersColumn({ mode, side }: { mode: Mode; side: Side }) {
-  const { team, visible } = useTeamData(mode, side);
-  const fadeStyle = useFadeVisible(visible);
+function PlayersColumn({ side }: { side: Side }) {
+  const { team } = useTeamData(side);
   const className = side === 'alpha' ? 'champ-alpha-players' : 'champ-bravo-players';
 
   return (
-    <div className={className} style={fadeStyle}>
+    <div className={className}>
       {team?.players.map((p, i) => (
         <div key={i} className="champ-player">{p}</div>
       ))}
@@ -47,20 +42,14 @@ function PlayersColumn({ mode, side }: { mode: Mode; side: Side }) {
   );
 }
 
-function ChampionsGraphic({ mode }: { mode: Mode }) {
+function ChampionsGraphic() {
   return (
     <div className="champ-container">
-      <TeamNames mode={mode} />
-      <PlayersColumn mode={mode} side="alpha" />
-      <PlayersColumn mode={mode} side="bravo" />
+      <TeamNames />
+      <PlayersColumn side="alpha" />
+      <PlayersColumn side="bravo" />
     </div>
   );
 }
 
-function App() {
-  const [activeMode] = useReplicant('activeMode');
-  if (!activeMode) return null;
-  return <ChampionsGraphic mode={activeMode} />;
-}
-
-createRoot(document.getElementById('root')!).render(<App />);
+createRoot(document.getElementById('root')!).render(<ChampionsGraphic />);

@@ -12,7 +12,6 @@ export const teamSchema = z.object({
   id: z.string(),
   name: z.string(),
   viewname: z.string(),
-  alias: z.string(),
   players: z.tuple([z.string(), z.string(), z.string(), z.string()]),
 });
 

@@ -77,20 +77,6 @@
   direction: ltr;
 }
 
-.side-alias {
-  font-size: 40px;
-  line-height: 1.4;
-  align-self: end;
-}
-
-.side-alpha .side-alias {
-  padding-left: 20px;
-}
-
-.side-bravo .side-alias {
-  padding-right: 20px;
-}
-
 .side-team-name {
   width: 900px;
   font-size: 110px;
