@@ -1,15 +1,9 @@
 import { FitText } from '../../components/FitText';
+import { formatXId } from '../../utils/formatXId';
 import { useTeamData } from './useTeamData';
 import { weaponImageUrl } from './weaponImageUrl';
 import type { Side } from '@/nodecg/messages';
 import type { Player } from '@/schemas';
-
-/** X(Twitter) ID の生値に `@` を付与して表示用文字列にする。空なら空文字。 */
-function formatXId(xId: string): string {
-  const trimmed = xId.trim();
-  if (!trimmed) return '';
-  return trimmed.startsWith('@') ? trimmed : `@${trimmed}`;
-}
 
 function PlayerRow({ player }: { player: Player }) {
   return (

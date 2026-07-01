@@ -1,7 +1,9 @@
 import './PreviewEditPanel.css';
 import { Fragment, useEffect, useState } from 'react';
 import { useReplicant } from '../../hooks/useReplicant';
+import { formatXId, xProfileUrl } from '../../utils/formatXId';
 import { stripHtml } from '../../utils/stripHtml';
+import { weaponImageUrl } from '../../graphics/_shared/weaponImageUrl';
 import type { Side } from '@/nodecg/messages';
 import type { Team, Player } from '@/schemas';
 
@@ -94,7 +96,7 @@ export function PreviewEditPanel() {
     if (!team) {
       return (
         <>
-          <th className={labelClass}>チーム名 (左右用)</th>
+          <th className={labelClass}>チーム名</th>
           <td />
           <td className="action-cell" />
         </>
@@ -103,7 +105,7 @@ export function PreviewEditPanel() {
     const isEditing = editTarget?.side === side;
     return (
       <>
-        <th className={labelClass}>チーム名 (左右用)</th>
+        <th className={labelClass}>チーム名</th>
         <td>
           {isEditing ? (
             <input
@@ -144,7 +146,8 @@ export function PreviewEditPanel() {
         </>
       );
     }
-    const playerName = team.players[idx]?.name ?? '';
+    const player = team.players[idx];
+    const playerName = player?.name ?? '';
     const isEditing = editPlayer?.side === side && editPlayer?.idx === idx;
     return (
       <>
@@ -159,9 +162,39 @@ export function PreviewEditPanel() {
               autoFocus
             />
           ) : (
-            <span className="field-value">
-              {stripHtml(playerName) || '(空欄)'}
-            </span>
+            <div className="preview-player-value">
+              <div className="preview-player-text">
+                <span className="field-value">
+                  {stripHtml(playerName) || '(空欄)'}
+                </span>
+                {(() => {
+                  const xId = player?.xId ?? '';
+                  const url = xProfileUrl(xId);
+                  return url ? (
+                    <a
+                      className="preview-player-xid"
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {formatXId(xId)}
+                    </a>
+                  ) : (
+                    <div className="preview-player-xid">{formatXId(xId)}</div>
+                  );
+                })()}
+              </div>
+              <div className="preview-player-weapons">
+                {player?.weapons.slice(0, 3).map((weaponId) => (
+                  <img
+                    key={weaponId}
+                    src={weaponImageUrl(weaponId)}
+                    className="preview-weapon-icon"
+                    alt=""
+                  />
+                ))}
+              </div>
+            </div>
           )}
         </td>
         <td className="action-cell">

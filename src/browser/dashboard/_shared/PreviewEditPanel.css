@@ -1,5 +1,5 @@
 .preview-edit-panel {
-  min-height: 476px;
+  min-height: 330px;
   /* body padding 12px × 2 を除いた値で合計 500px */
 }
 
@@ -89,6 +89,43 @@
   display: block;
   min-height: 1.4em;
   word-break: break-word;
+}
+
+.preview-player-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.preview-player-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.preview-player-weapons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  min-width: 104px;
+  margin-left: auto;
+}
+
+.preview-weapon-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.preview-player-xid {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+a.preview-player-xid:hover {
+  text-decoration: underline;
 }
 
 .action-cell {
