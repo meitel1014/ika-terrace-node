@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 export type Status = 'idle' | 'loading' | 'done' | 'error';
 
-type ReloadMessage = 'reloadTeamsCsv' | 'reloadCastJson';
+type ReloadMessage = 'reloadTeamsCsv' | 'reloadTeamsFromSheets' | 'reloadCastJson';
 
 export function statusLabel(status: Status, idleLabel: string): string {
   if (status === 'loading') return '読み込み中…';

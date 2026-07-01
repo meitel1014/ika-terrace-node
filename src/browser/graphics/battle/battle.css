@@ -1,4 +1,4 @@
-.champ-container {
+.battle-container {
   position: relative;
   width: 1920px;
   height: 1080px;
@@ -7,7 +7,7 @@
 }
 
 /* 左上: チーム名ブロック */
-.champ-team-names {
+.battle-team-names {
   position: absolute;
   top: 127px;
   left: 111px;
@@ -15,7 +15,7 @@
 }
 
 /* チーム名1行ぶんのラッパー（上下中央揃え・2行改行に対応） */
-.champ-team-name-wrapper {
+.battle-team-name-wrapper {
   position: absolute;
   display: flex;
   align-items: center;
@@ -23,23 +23,23 @@
   height: 42px;
 }
 
-.champ-team-name-wrapper.team-alpha{
+.battle-team-name-wrapper.team-alpha{
   top: 0px;
 
 }
 
-.champ-team-name-wrapper.team-bravo{
+.battle-team-name-wrapper.team-bravo{
   top: 95px;
 }
 
 /* FitText のルート div */
-.champ-team-name {
+.battle-team-name {
   font-size: 28px;
   width: 100%;
 }
 
 /* 左下: アルファプレイヤー */
-.champ-alpha-players {
+.battle-alpha-players {
   position: absolute;
   bottom: 15px;
   left: 50px;
@@ -50,7 +50,7 @@
 }
 
 /* 右下: ブラボープレイヤー */
-.champ-bravo-players {
+.battle-bravo-players {
   position: absolute;
   bottom: 15px;
   right: 50px;
@@ -60,12 +60,12 @@
   gap: 17px;
 }
 
-.champ-player {
+.battle-player {
   font-size: 28px;
   line-height: 1.2;
   letter-spacing: -0.05em;
 }
 
-.champ-bravo-players .champ-player {
+.battle-bravo-players .battle-player {
   text-align: right;
 }

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseCsv } from './csv';
-import type { TeamsPool, Team } from '../schemas';
+import type { TeamsPool, Team, Player } from '../schemas';
 
 const CSV_PATH = path.resolve(process.cwd(), 'data/teams.csv');
 
@@ -54,15 +54,21 @@ export function parseTeamsPoolFromCsvText(raw: string): TeamsPool {
     serial++;
     const rawViewname = idx.viewname >= 0 ? (row[idx.viewname] ?? '').trim() : '';
 
+    const toPlayer = (colIdx: number): Player => ({
+      name: colIdx >= 0 ? (row[colIdx] ?? '').trim() : '',
+      xId: '',
+      weapons: [],
+    });
+
     const team: Team = {
       id:       String(serial),
       name:     rawName,
       viewname: rawViewname || rawName,
       players: [
-        idx.players[0] >= 0 ? (row[idx.players[0]] ?? '').trim() : '',
-        idx.players[1] >= 0 ? (row[idx.players[1]] ?? '').trim() : '',
-        idx.players[2] >= 0 ? (row[idx.players[2]] ?? '').trim() : '',
-        idx.players[3] >= 0 ? (row[idx.players[3]] ?? '').trim() : '',
+        toPlayer(idx.players[0]),
+        toPlayer(idx.players[1]),
+        toPlayer(idx.players[2]),
+        toPlayer(idx.players[3]),
       ],
     };
 

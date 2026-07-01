@@ -3,7 +3,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { useReplicant } from '../../hooks/useReplicant';
 import { stripHtml } from '../../utils/stripHtml';
 import type { Side } from '@/nodecg/messages';
-import type { Team } from '@/schemas';
+import type { Team, Player } from '@/schemas';
 
 type EditTarget = {
   side: Side;
@@ -74,11 +74,11 @@ export function PreviewEditPanel() {
       setEditPlayer(null);
       return;
     }
-    const newPlayers = [...team.players] as [string, string, string, string];
-    newPlayers[idx] = newPlayerName;
+    const patchPlayers: Partial<Player>[] = [];
+    patchPlayers[idx] = { name: newPlayerName };
     void nodecg.sendMessage('updateTeam', {
       teamId: team.id,
-      patch: { players: newPlayers },
+      patch: { players: patchPlayers },
     });
     setEditPlayer(null);
   };
@@ -144,7 +144,7 @@ export function PreviewEditPanel() {
         </>
       );
     }
-    const playerName = team.players[idx] ?? '';
+    const playerName = team.players[idx]?.name ?? '';
     const isEditing = editPlayer?.side === side && editPlayer?.idx === idx;
     return (
       <>

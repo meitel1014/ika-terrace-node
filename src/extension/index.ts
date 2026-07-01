@@ -1,7 +1,10 @@
 import type { NodeCG } from './nodecg';
 import { loadTeamsPoolFromCsv, parseTeamsPoolFromCsvText } from './loadTeams';
+import { loadTeamsFromSheets } from './loadTeamsFromSheets';
+import { createWeaponImageMiddleware } from './serveWeaponImages';
 import { loadCastCandidates } from './loadCastCandidates';
 import { castCandidatesSchema } from '../schemas';
+import type { Team } from '../schemas';
 
 export default (nodecg: NodeCG) => {
   const log = new nodecg.Logger('ikaterrace');
@@ -11,11 +14,20 @@ export default (nodecg: NodeCG) => {
   const castCandidatesRep = nodecg.Replicant('castCandidates');
   const castMembersRep = nodecg.Replicant('castMembers');
 
-  // 初回起動時のみ CSV から teamsPool を初期化。
+  // 初回起動時のみ teamsPool を初期化。Googleスプレッドシートを優先し、
+  // 読み込めない場合（未設定・認証失敗等）は data/teams.csv にフォールバックする。
   if ((teamsPoolRep.value ?? []).length === 0) {
-    const loaded = loadTeamsPoolFromCsv();
-    teamsPoolRep.value = loaded;
-    log.info(`Loaded teams from CSV: ${loaded.length}`);
+    void (async () => {
+      const fromSheets = await loadTeamsFromSheets(log);
+      if (fromSheets && fromSheets.length > 0) {
+        teamsPoolRep.value = fromSheets;
+        log.info(`Loaded teams from Google Sheets: ${fromSheets.length}`);
+      } else {
+        const loaded = loadTeamsPoolFromCsv();
+        teamsPoolRep.value = loaded;
+        log.info(`Loaded teams from CSV (fallback): ${loaded.length}`);
+      }
+    })();
   }
 
   castCandidatesRep.value = loadCastCandidates();
@@ -136,6 +148,9 @@ export default (nodecg: NodeCG) => {
     });
   });
 
+  // GET /weapon-images/{id}.png
+  nodecg.mount('/weapon-images', createWeaponImageMiddleware(log));
+
   // ── Message ハンドラ ───────────────────────────────────
 
   nodecg.listenFor('reloadTeamsCsv', (_data, ack) => {
@@ -143,6 +158,20 @@ export default (nodecg: NodeCG) => {
     teamsPoolRep.value = loaded;
     log.info(`Reloaded teams from CSV: ${loaded.length}`);
     if (ack && !ack.handled) ack(null);
+  });
+
+  nodecg.listenFor('reloadTeamsFromSheets', (_data, ack) => {
+    void (async () => {
+      const loaded = await loadTeamsFromSheets(log);
+      if (loaded) {
+        teamsPoolRep.value = loaded;
+        log.info(`Reloaded teams from Google Sheets: ${loaded.length}`);
+        if (ack && !ack.handled) ack(null);
+      } else {
+        log.warn('reloadTeamsFromSheets: スプレッドシート読み込みに失敗（teamsPoolは変更なし）');
+        if (ack && !ack.handled) ack('スプレッドシート読み込みに失敗しました');
+      }
+    })();
   });
 
   nodecg.listenFor('updateTeam', ({ teamId, patch }, ack) => {
@@ -159,14 +188,13 @@ export default (nodecg: NodeCG) => {
     }
 
     const prev = pool[idx];
-    const updated = { ...prev, ...patch };
-    if (patch.players) {
-      updated.players = [
-        patch.players[0] ?? prev.players[0],
-        patch.players[1] ?? prev.players[1],
-        patch.players[2] ?? prev.players[2],
-        patch.players[3] ?? prev.players[3],
-      ];
+    const { players: patchPlayers, ...patchRest } = patch;
+    const updated: Team = { ...prev, ...patchRest };
+    if (patchPlayers) {
+      updated.players = prev.players.map((p, i) => ({
+        ...p,
+        ...patchPlayers[i],
+      })) as Team['players'];
     }
 
     const newPool = [...pool];

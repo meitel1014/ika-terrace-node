@@ -1,0 +1,56 @@
+/* team-roster-alpha / team-roster-bravo: 1920x1080 フルスクリーン、片チームのみ表示 */
+
+:root {
+  font-family: "Noto Sans JP";
+  color: #202020;
+}
+
+.roster-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 1080px;
+  display: flex;
+  flex-direction: column;
+  padding: 48px;
+  box-sizing: border-box;
+}
+
+.roster-team-name {
+  font-size: 64px;
+  margin-bottom: 32px;
+}
+
+.roster-players {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.roster-player {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.roster-player-name {
+  font-size: 40px;
+  min-width: 320px;
+}
+
+.roster-player-weapons {
+  display: flex;
+  gap: 8px;
+  min-width: 168px;
+}
+
+.roster-weapon-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.roster-player-xid {
+  font-size: 28px;
+  opacity: 0.8;
+}

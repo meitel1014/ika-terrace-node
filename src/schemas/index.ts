@@ -1,8 +1,8 @@
 export { bundleConfigSchema } from './bundleConfig';
 export type { BundleConfig } from './bundleConfig';
 
-export { teamSchema } from './team';
-export type { Team } from './team';
+export { teamSchema, playerSchema } from './team';
+export type { Team, Player } from './team';
 
 export { teamsPoolSchema } from './teamsPool';
 export type { TeamsPool } from './teamsPool';

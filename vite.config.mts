@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     server: {
-      port: 8080,
+      port: 9080,
       strictPort: true,
     },
     resolve: {
@@ -32,6 +32,7 @@ export default defineConfig(({ mode }) => {
           plugins: [rollupEsbuild(), rollupExternals()],
         },
         typekitKitId: env.TYPEKIT_KIT_ID ?? '',
+        server: { port: 9080 },
       }),
       nodecgSchemas(),
     ],

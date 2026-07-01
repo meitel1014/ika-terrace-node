@@ -1,5 +1,5 @@
 import '@/browser/global.css';
-import './champions.css';
+import './battle.css';
 import { createRoot } from 'react-dom/client';
 import { FitText } from '@/browser/components/FitText';
 import { useTeamData } from '../_shared/useTeamData';
@@ -10,19 +10,19 @@ function TeamNames() {
   const bravo = useTeamData('bravo');
 
   return (
-    <div className="champ-team-names">
-      <div className="champ-team-name-wrapper team-alpha">
+    <div className="battle-team-names">
+      <div className="battle-team-name-wrapper team-alpha">
         <FitText
           html={alpha.team?.viewname ?? ''}
           align="left"
-          className="champ-team-name"
+          className="battle-team-name"
         />
       </div>
-      <div className="champ-team-name-wrapper team-bravo">
+      <div className="battle-team-name-wrapper team-bravo">
         <FitText
           html={bravo.team?.viewname ?? ''}
           align="left"
-          className="champ-team-name"
+          className="battle-team-name"
         />
       </div>
     </div>
@@ -31,20 +31,20 @@ function TeamNames() {
 
 function PlayersColumn({ side }: { side: Side }) {
   const { team } = useTeamData(side);
-  const className = side === 'alpha' ? 'champ-alpha-players' : 'champ-bravo-players';
+  const className = side === 'alpha' ? 'battle-alpha-players' : 'battle-bravo-players';
 
   return (
     <div className={className}>
       {team?.players.map((p, i) => (
-        <div key={i} className="champ-player">{p}</div>
+        <div key={i} className="battle-player">{p.name}</div>
       ))}
     </div>
   );
 }
 
-function ChampionsGraphic() {
+function BattleGraphic() {
   return (
-    <div className="champ-container">
+    <div className="battle-container">
       <TeamNames />
       <PlayersColumn side="alpha" />
       <PlayersColumn side="bravo" />
@@ -52,4 +52,4 @@ function ChampionsGraphic() {
   );
 }
 
-createRoot(document.getElementById('root')!).render(<ChampionsGraphic />);
+createRoot(document.getElementById('root')!).render(<BattleGraphic />);

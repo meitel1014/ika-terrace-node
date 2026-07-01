@@ -1,4 +1,4 @@
-import type { Team, CastMembers } from '../schemas';
+import type { Team, Player, CastMembers } from '../schemas';
 
 export type Side = 'alpha' | 'bravo';
 
@@ -10,8 +10,19 @@ export type MessageMap = {
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- ts-nodecg の規約：データなしメッセージは {} で表現
   reloadTeamsCsv: {};
 
+  /**
+   * Google スプレッドシート（申請フォーム + 選手情報登録フォーム）から teamsPool を再読み込み。
+   * 読み込みに失敗した場合 teamsPool は変更されない。
+   */
+  reloadTeamsFromSheets: { error: string };
+
   /** teamsPool 内の 1 チームを ID キーで部分更新する */
-  updateTeam: { data: { teamId: string; patch: Partial<Team> } };
+  updateTeam: {
+    data: {
+      teamId: string;
+      patch: Partial<Omit<Team, 'players'>> & { players?: Partial<Player>[] };
+    };
+  };
 
   /** data/cast.json から castCandidates を再読み込み */
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- ts-nodecg の規約：データなしメッセージは {} で表現

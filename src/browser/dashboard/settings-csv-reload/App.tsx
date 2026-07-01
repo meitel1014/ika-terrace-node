@@ -9,6 +9,7 @@ function uploadLabel(status: Status): string {
 }
 
 export function CsvReloadPanel() {
+  const teamsFromSheets = useReloadButton('reloadTeamsFromSheets');
   const teams = useReloadButton('reloadTeamsCsv');
   const [uploadStatus, setUploadStatus] = useState<Status>('idle');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -46,6 +47,13 @@ export function CsvReloadPanel() {
         編集内容はすべて破棄されます。
       </p>
       <div style={{ display: 'flex', gap: '8px' }}>
+        <button
+          onClick={teamsFromSheets.handle}
+          disabled={teamsFromSheets.status === 'loading'}
+          className="btn btn-reload"
+        >
+          {statusLabel(teamsFromSheets.status, 'スプレッドシートから再読込')}
+        </button>
         <button
           onClick={teams.handle}
           disabled={teams.status === 'loading'}
