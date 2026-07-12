@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, type HTMLAttributes } from 'react';
+import { observeFitMeasure } from '../utils/observeFitMeasure';
 
 type Props = {
   name: string;
@@ -19,8 +20,8 @@ export function JustifyName({ name, style, className, ...rest }: Props) {
     const inner = innerRef.current;
     if (!container || !inner) return;
 
-    inner.style.transform = 'none';
-    const id = requestAnimationFrame(() => {
+    // フォント差し替え（Typekit の遅延適用）を ResizeObserver で検知して測り直す
+    return observeFitMeasure(inner, () => {
       const contentWidth = inner.scrollWidth;
       const availableWidth = container.clientWidth;
       const ratio = contentWidth > availableWidth && contentWidth > 0
@@ -28,7 +29,6 @@ export function JustifyName({ name, style, className, ...rest }: Props) {
         : 1;
       setScaleX(ratio);
     });
-    return () => cancelAnimationFrame(id);
   }, [name]);
 
   return (

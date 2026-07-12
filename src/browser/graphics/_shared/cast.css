@@ -1,7 +1,9 @@
 /* cast graphic 共通: コンテナ・役職ごとの枠スタイル */
 
 .cast-graphic {
-  font-family: "ab-don", sans-serif;
+  font-family: 'vdl-v7marugothic', sans-serif;
+  font-weight: 800;
+  color: #000000;
   position: relative;
   width: 1920px;
   height: 1080px;

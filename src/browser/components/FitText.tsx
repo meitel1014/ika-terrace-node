@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, type HTMLAttributes } from 'react';
+import { observeFitMeasure } from '../utils/observeFitMeasure';
 
 type Props = {
   /** レンダリングする生 HTML 文字列 */
@@ -22,10 +23,10 @@ export function FitText({ html, align = 'left', style, ...rest }: Props) {
     const inner = innerRef.current;
     if (!container || !inner) return;
 
-    // 一旦スケール・高さをリセットし、次フレームでレイアウト反映後に測定する
-    inner.style.transform = 'none';
-    container.style.height = 'auto';
-    const id = requestAnimationFrame(() => {
+    // フォント差し替え（Typekit の遅延適用）を ResizeObserver で検知して測り直す
+    return observeFitMeasure(inner, () => {
+      // 一旦高さをリセットしてから測定する
+      container.style.height = 'auto';
       const contentWidth = inner.scrollWidth;
       const availableWidth = container.clientWidth;
       const contentHeight = inner.scrollHeight;
@@ -43,7 +44,6 @@ export function FitText({ html, align = 'left', style, ...rest }: Props) {
       // コンテナの高さを視覚サイズに合わせる（transform はレイアウトに影響しないため）
       container.style.height = `${contentHeight * newScale}px`;
     });
-    return () => cancelAnimationFrame(id);
   }, [html]);
 
   const origin = align === 'right' ? 'right top' : 'left top';

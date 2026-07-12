@@ -10,7 +10,7 @@
 /* 左上: チーム名ブロック */
 .battle-team-names {
   position: absolute;
-  top: 110px;
+  top: 113px;
   left: 55px;
   height: 140px;
 }
@@ -21,7 +21,7 @@
   display: flex;
   align-items: center;
   width: 280px;
-  height: 60px;
+  height: 70px;
   font-size: 36px;
 }
 
