@@ -2,16 +2,17 @@
   position: relative;
   width: 1920px;
   height: 1080px;
-  font-family: 'チェックポイント★リベンジ', sans-serif;
-  color: #ffffff;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-weight: bold;
+  color: #000000;
 }
 
 /* 左上: チーム名ブロック */
 .battle-team-names {
   position: absolute;
-  top: 127px;
-  left: 111px;
-  height: 143px;
+  top: 122px;
+  left: 60px;
+  height: 140px;
 }
 
 /* チーム名1行ぶんのラッパー（上下中央揃え・2行改行に対応） */
@@ -21,6 +22,7 @@
   align-items: center;
   width: 252px;
   height: 42px;
+  font-size: 50px;
 }
 
 .battle-team-name-wrapper.team-alpha{
@@ -29,41 +31,39 @@
 }
 
 .battle-team-name-wrapper.team-bravo{
-  top: 95px;
+  top: 81px;
 }
 
 /* FitText のルート div */
 .battle-team-name {
-  font-size: 28px;
   width: 100%;
 }
 
 /* 左下: アルファプレイヤー */
 .battle-alpha-players {
   position: absolute;
-  bottom: 15px;
-  left: 50px;
+  bottom: 7px;
+  left: 40px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 17px;
+  gap: 26px;
 }
 
 /* 右下: ブラボープレイヤー */
 .battle-bravo-players {
   position: absolute;
-  bottom: 15px;
-  right: 50px;
+  bottom: 7px;
+  right: 40px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 17px;
+  gap: 26px;
 }
 
 .battle-player {
   font-size: 28px;
   line-height: 1.2;
-  letter-spacing: -0.05em;
 }
 
 .battle-bravo-players .battle-player {
