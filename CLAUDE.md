@@ -5,7 +5,7 @@
 スプラトゥーン 3 を用いたトーナメント大会の配信グラフィックシステム。
 チーム情報を Dashboard から操作し、配信画面と会場スクリーンにオーバーレイ表示する。
 
-バンドル名: `dezifes-nodecg`（[package.json](package.json) の `name` と [bundleName.ts](bundleName.ts) の `BUNDLE_NAME` で定義。一致必須）
+バンドル名: `ika-terrace-node`（[package.json](package.json) の `name` と [bundleName.ts](bundleName.ts) の `BUNDLE_NAME` で定義。一致必須）
 
 ## 技術スタック
 
@@ -187,7 +187,7 @@ CSV・data/ 仕様: [data/CLAUDE.md](data/CLAUDE.md)
 ## 重要な挙動メモ
 
 - **Googleスプレッドシート連携**: 認証はGCPサービスアカウント（鍵は `data/credentials/` 配下の最初の `.json` を自動検出、中身は読み取り禁止）。詳細仕様は [data/CLAUDE.md](data/CLAUDE.md) 参照。
-- **武器画像配信**: `GET /bundles/dezifes-nodecg/weapon-images/{id}.png`（`serveWeaponImages.ts`、パストラバーサル対策済み）。
+- **武器画像配信**: `GET /bundles/ika-terrace-node/weapon-images/{id}.png`（`serveWeaponImages.ts`、パストラバーサル対策済み）。
 - **CSV アップロード**: `POST /upload-teams-csv`（body: UTF-8 テキスト）でファイルアップロード後に `teamsPool` を再初期化。`settings-csv-reload` パネルから利用可能。
 - **Replicant 永続化**: NodeCG の `db/` 配下に JSON で自動保存される。編集内容はプロセス再起動後も残る。初回起動時のみスプレッドシート/CSV から初期化。
 - **Replicant の初期値**: Zod スキーマの `.default(...)` で定義。Extension では `defaultValue` を渡さない。
