@@ -109,7 +109,8 @@
   align-items: center;
   justify-content: flex-start;
   gap: 4px;
-  min-width: 104px;
+  width: 128px;
+  flex: none;
   margin-left: auto;
 }
 
