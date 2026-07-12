@@ -10,6 +10,9 @@ export type { TeamsPool } from './teamsPool';
 export { selectionSchema } from './selection';
 export type { Selection } from './selection';
 
+export { winCountSchema } from './winCount';
+export type { WinCount } from './winCount';
+
 export { castCandidatesSchema } from './castCandidates';
 export type { CastCandidates } from './castCandidates';
 

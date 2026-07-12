@@ -2,16 +2,17 @@
   position: relative;
   width: 1920px;
   height: 1080px;
-  font-family: 'チェックポイント★リベンジ', sans-serif;
-  color: #ffffff;
+  font-family: 'vdl-v7marugothic', sans-serif;
+  font-weight: 800;
+  color: #000000;
 }
 
 /* 左上: チーム名ブロック */
 .battle-team-names {
   position: absolute;
-  top: 127px;
-  left: 111px;
-  height: 143px;
+  top: 113px;
+  left: 55px;
+  height: 140px;
 }
 
 /* チーム名1行ぶんのラッパー（上下中央揃え・2行改行に対応） */
@@ -19,51 +20,68 @@
   position: absolute;
   display: flex;
   align-items: center;
-  width: 252px;
-  height: 42px;
+  width: 280px;
+  height: 70px;
+  font-size: 36px;
 }
 
 .battle-team-name-wrapper.team-alpha{
   top: 0px;
-
 }
 
 .battle-team-name-wrapper.team-bravo{
-  top: 95px;
+  top: 78px;
 }
 
 /* FitText のルート div */
 .battle-team-name {
-  font-size: 28px;
   width: 100%;
+}
+
+/* チーム名の右横に表示する勝利数（本数）
+   wrapper が position:absolute なので left:100% で名前枠の右端に置く。
+   FitText の width:100% を邪魔しないよう絶対配置にしている。
+   幅を固定 + text-align:right で右端を固定し、桁が増えたら左へ伸びる（1桁で右寄せ）。
+   位置(margin-left)・幅(width)・フォントサイズは仮置き。微調整は手動で行う。 */
+.battle-win-count {
+  position: absolute;
+  left: 241px;
+  top: 56%;
+  transform: translateY(-50%);
+  margin-left: 24px;
+  width: 1.2em;
+  text-align: right;
+  letter-spacing: -0.1em;
+  font-family: 'vdl-logomarujr-pop-futoline', sans-serif;
+  font-size: 60px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* 左下: アルファプレイヤー */
 .battle-alpha-players {
   position: absolute;
-  bottom: 15px;
-  left: 50px;
+  bottom: 7px;
+  left: 40px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 17px;
+  gap: 26px;
 }
 
 /* 右下: ブラボープレイヤー */
 .battle-bravo-players {
   position: absolute;
-  bottom: 15px;
-  right: 50px;
+  bottom: 7px;
+  right: 40px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 17px;
+  gap: 26px;
 }
 
 .battle-player {
   font-size: 28px;
   line-height: 1.2;
-  letter-spacing: -0.05em;
 }
 
 .battle-bravo-players .battle-player {

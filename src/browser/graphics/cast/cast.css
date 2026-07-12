@@ -2,15 +2,15 @@
 /* 細かい数値は後で手動調整してください */
 
 .cast-layout--main .role--announcer {
-  width: 350px;
-  bottom: 325px;
-  left: 495px;
+  width: 500px;
+  bottom: 170px;
+  left: 350px;
   font-size: 80px;
 }
 
 .cast-layout--main .role--commentator {
-  width: 350px;
-  bottom: 325px;
+  width: 500px;
+  bottom: 170px;
   left: 1125px;
   font-size: 80px;
 }
