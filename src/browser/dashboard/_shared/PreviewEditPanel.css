@@ -148,3 +148,44 @@ a.preview-player-xid:hover {
 .btn-edit:hover {
   color: var(--text);
 }
+
+/* ── 勝利数（本数）行 ── */
+
+/* 左に − 本数 ＋ のステッパー、右端にリセット（編集ボタンと同じ右寄せ） */
+.preview-win-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.preview-win-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.preview-win-count {
+  display: inline-block;
+  min-width: 1.4em;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.btn-win {
+  min-width: 32px;
+  font-size: 15px;
+}
+
+.btn-win-reset {
+  color: var(--text-muted);
+}
+
+.btn-win:disabled,
+.btn-win-reset:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

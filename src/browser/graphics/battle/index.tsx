@@ -2,12 +2,14 @@ import '@/browser/global.css';
 import './battle.css';
 import { createRoot } from 'react-dom/client';
 import { FitText } from '@/browser/components/FitText';
+import { useReplicant } from '@/browser/hooks/useReplicant';
 import { useTeamData } from '../_shared/useTeamData';
 import type { Side } from '@/nodecg/messages';
 
 function TeamNames() {
   const alpha = useTeamData('alpha');
   const bravo = useTeamData('bravo');
+  const [winCount] = useReplicant('winCount');
 
   return (
     <div className="battle-team-names">
@@ -17,6 +19,7 @@ function TeamNames() {
           align="left"
           className="battle-team-name"
         />
+        <span className="battle-win-count">{winCount?.alpha ?? 0}</span>
       </div>
       <div className="battle-team-name-wrapper team-bravo">
         <FitText
@@ -24,6 +27,7 @@ function TeamNames() {
           align="left"
           className="battle-team-name"
         />
+        <span className="battle-win-count">{winCount?.bravo ?? 0}</span>
       </div>
     </div>
   );

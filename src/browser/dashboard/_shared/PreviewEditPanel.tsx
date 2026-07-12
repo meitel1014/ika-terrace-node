@@ -24,6 +24,7 @@ const PLAYER_LABELS = ['プレイヤー1', 'プレイヤー2', 'プレイヤー3
 export function PreviewEditPanel() {
   const [teamsPool] = useReplicant('teamsPool');
   const [selection] = useReplicant('selection');
+  const [winCount, setWinCount] = useReplicant('winCount');
   const [editTarget, setEditTarget] = useState<EditTarget | null>(null);
   const [editPlayer, setEditPlayer] = useState<EditPlayerTarget | null>(null);
 
@@ -87,6 +88,15 @@ export function PreviewEditPanel() {
   const handlePlayerKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') savePlayerEdit();
     if (e.key === 'Escape') cancelPlayerEdit();
+  };
+
+  // ── 勝利数（本数）の操作 ──
+  const wc = winCount ?? { alpha: 0, bravo: 0 };
+  const changeWin = (side: Side, delta: number) => {
+    setWinCount({ ...wc, [side]: Math.max(0, wc[side] + delta) });
+  };
+  const resetWin = (side: Side) => {
+    setWinCount({ ...wc, [side]: 0 });
   };
 
   // ── セルレンダラー（side ごとにラベル込み 3 セルを返す） ──
@@ -213,6 +223,44 @@ export function PreviewEditPanel() {
     );
   };
 
+  const renderWinCountCells = (side: Side) => {
+    const labelClass = `preview-row-label${side === 'bravo' ? ' preview-bravo-col' : ''}`;
+    const team = side === 'alpha' ? alphaTeam : bravoTeam;
+    return (
+      <>
+        <th className={labelClass}>本数</th>
+        <td colSpan={2}>
+          <div className="preview-win-controls">
+            <div className="preview-win-stepper">
+              <button
+                className="btn-sm btn-win"
+                onClick={() => changeWin(side, -1)}
+                disabled={!team}
+              >
+                −
+              </button>
+              <span className="preview-win-count">{wc[side]}</span>
+              <button
+                className="btn-sm btn-win"
+                onClick={() => changeWin(side, 1)}
+                disabled={!team}
+              >
+                ＋
+              </button>
+            </div>
+            <button
+              className="btn-sm btn-win-reset"
+              onClick={() => resetWin(side)}
+              disabled={!team}
+            >
+              リセット
+            </button>
+          </div>
+        </td>
+      </>
+    );
+  };
+
   return (
     <div className="preview-edit-panel">
       <table className="preview-table">
@@ -251,6 +299,11 @@ export function PreviewEditPanel() {
               </tr>
             </Fragment>
           ))}
+          <tr className="preview-win-row">
+            {renderWinCountCells('alpha')}
+            <td className="preview-spacer-col" />
+            {renderWinCountCells('bravo')}
+          </tr>
         </tbody>
       </table>
     </div>

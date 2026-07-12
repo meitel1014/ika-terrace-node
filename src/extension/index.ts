@@ -11,8 +11,31 @@ export default (nodecg: NodeCG) => {
   log.info('=====Extension is running=====');
 
   const teamsPoolRep = nodecg.Replicant('teamsPool');
+  const selectionRep = nodecg.Replicant('selection');
+  const winCountRep = nodecg.Replicant('winCount');
   const castCandidatesRep = nodecg.Replicant('castCandidates');
   const castMembersRep = nodecg.Replicant('castMembers');
+
+  // チーム選択が入れ替わったら、その枠の勝利数を 0 にリセットする。
+  // Extension 側で一元化することで、Dashboard 経由でもプログラム経由でも確実にリセットされる。
+  selectionRep.on('change', (newVal, oldVal) => {
+    if (!newVal || !oldVal) return; // 初回購読（oldVal=undefined）はスキップ
+    const wc = winCountRep.value ?? { alpha: 0, bravo: 0 };
+    const next = { ...wc };
+    let changed = false;
+    if (newVal.alpha !== oldVal.alpha) {
+      next.alpha = 0;
+      changed = true;
+    }
+    if (newVal.bravo !== oldVal.bravo) {
+      next.bravo = 0;
+      changed = true;
+    }
+    if (changed) {
+      winCountRep.value = next;
+      log.info(`[winCount] selection 変更により勝利数をリセット: ${JSON.stringify(next)}`);
+    }
+  });
 
   // 初回起動時のみ teamsPool を初期化。Googleスプレッドシートを優先し、
   // 読み込めない場合（未設定・認証失敗等）は data/teams.csv にフォールバックする。
@@ -150,6 +173,36 @@ export default (nodecg: NodeCG) => {
 
   // GET /weapon-images/{id}.png
   nodecg.mount('/weapon-images', createWeaponImageMiddleware(log));
+
+  // OBS 等の外部トリガーから勝利数（本数）を操作するエンドポイント
+  // POST /result  (body: { "result": "alpha_win" | "bravo_win" | "reset" }, Content-Type: application/json)
+  //   alpha_win / bravo_win → 該当枠 +1、reset → 両枠 0
+  // NodeCG がグローバルに express.json() を適用済みのため、パース済みの req.body を参照する
+  // （不正な JSON はここに到達する前に 400 系で弾かれる）。
+  nodecg.mount('/result', (req, res) => {
+    if (req.method !== 'POST') {
+      res.status(405).end();
+      return;
+    }
+
+    const result = (req.body as { result?: unknown } | undefined)?.result;
+    if (result !== 'alpha_win' && result !== 'bravo_win' && result !== 'reset') {
+      log.error('[result] 試合結果受信エラー: ' + String(result));
+      res.status(400).json({ error: 'invalid result' });
+      return;
+    }
+
+    const wc = winCountRep.value ?? { alpha: 0, bravo: 0 };
+    if (result === 'reset') {
+      winCountRep.value = { alpha: 0, bravo: 0 };
+    } else if (result === 'alpha_win') {
+      winCountRep.value = { ...wc, alpha: wc.alpha + 1 };
+    } else {
+      winCountRep.value = { ...wc, bravo: wc.bravo + 1 };
+    }
+    log.info(`[result] '${result}' -> winCount=${JSON.stringify(winCountRep.value)}`);
+    res.status(202).end();
+  });
 
   // ── Message ハンドラ ───────────────────────────────────
 

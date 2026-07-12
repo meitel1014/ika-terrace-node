@@ -2,16 +2,16 @@
   position: relative;
   width: 1920px;
   height: 1080px;
-  font-family: 'Zen Maru Gothic', sans-serif;
-  font-weight: bold;
+  font-family: 'vdl-v7marugothic', sans-serif;
+  font-weight: 800;
   color: #000000;
 }
 
 /* 左上: チーム名ブロック */
 .battle-team-names {
   position: absolute;
-  top: 122px;
-  left: 60px;
+  top: 110px;
+  left: 55px;
   height: 140px;
 }
 
@@ -20,23 +20,41 @@
   position: absolute;
   display: flex;
   align-items: center;
-  width: 252px;
-  height: 42px;
-  font-size: 50px;
+  width: 280px;
+  height: 60px;
+  font-size: 36px;
 }
 
 .battle-team-name-wrapper.team-alpha{
   top: 0px;
-
 }
 
 .battle-team-name-wrapper.team-bravo{
-  top: 81px;
+  top: 78px;
 }
 
 /* FitText のルート div */
 .battle-team-name {
   width: 100%;
+}
+
+/* チーム名の右横に表示する勝利数（本数）
+   wrapper が position:absolute なので left:100% で名前枠の右端に置く。
+   FitText の width:100% を邪魔しないよう絶対配置にしている。
+   幅を固定 + text-align:right で右端を固定し、桁が増えたら左へ伸びる（1桁で右寄せ）。
+   位置(margin-left)・幅(width)・フォントサイズは仮置き。微調整は手動で行う。 */
+.battle-win-count {
+  position: absolute;
+  left: 241px;
+  top: 56%;
+  transform: translateY(-50%);
+  margin-left: 24px;
+  width: 1.2em;
+  text-align: right;
+  letter-spacing: -0.1em;
+  font-family: 'vdl-logomarujr-pop-futoline', sans-serif;
+  font-size: 60px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* 左下: アルファプレイヤー */
