@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useReplicant } from '@/browser/hooks/useReplicant';
-import { JustifyName } from '@/browser/components/JustifyName';
+import { FitText } from '@/browser/components/FitText';
+import { castIconUrl } from './castIconUrl';
 import type { CastMembers } from '@/schemas';
 
 type Props = {
@@ -13,6 +15,25 @@ const EMPTY: CastMembers = {
   observer: '',
 };
 
+/** アイコン（円形・左）＋ 名前（FitText で等比縮小・中央寄せ）を横並びに表示する。 */
+function CastIconName({ name }: { name: string }) {
+  // 名前が変わったらエラー状態をリセットするため key に name を使う（下の呼び出し側で付与）。
+  const [failed, setFailed] = useState(false);
+
+  return (
+    <>
+      {name && (
+        <div className="cast-icon">
+          {!failed && (
+            <img src={castIconUrl(name)} alt="" onError={() => setFailed(true)} />
+          )}
+        </div>
+      )}
+      <FitText html={name} align="left" className="cast-name" />
+    </>
+  );
+}
+
 export function CastGraphic({ layoutClass }: Props) {
   const [members] = useReplicant('castMembers');
   const m = members ?? EMPTY;
@@ -20,22 +41,10 @@ export function CastGraphic({ layoutClass }: Props) {
   return (
     <div className={`cast-graphic ${layoutClass}`}>
       <div className="role role--announcer">
-        <JustifyName name={m.announcer} />
+        <CastIconName key={m.announcer} name={m.announcer} />
       </div>
       <div className="role role--commentator">
-        <JustifyName name={m.commentator} />
-      </div>
-      <div className="role-label role-label--operator">
-        <JustifyName name="配信：" />
-      </div>
-      <div className="role role--operator">
-        <JustifyName name={m.operator} />
-      </div>
-      <div className="role-label role-label--observer">
-        <JustifyName name="オブザーバー：" />
-      </div>
-      <div className="role role--observer">
-        <JustifyName name={m.observer} />
+        <CastIconName key={m.commentator} name={m.commentator} />
       </div>
     </div>
   );
