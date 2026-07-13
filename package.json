@@ -30,10 +30,10 @@
         "width": 8
       },
       {
-        "name": "battle-win-target",
-        "title": "必要勝利数",
-        "file": "battle-win-target.html",
-        "workspace": "Battle",
+        "name": "settings-win-target",
+        "title": "設定｜必要勝利数",
+        "file": "settings-win-target.html",
+        "workspace": "設定",
         "width": 4
       },
       {
