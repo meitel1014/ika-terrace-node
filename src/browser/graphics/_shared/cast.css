@@ -12,8 +12,32 @@
 
 .role {
   position: absolute;
+  display: flex;
+  align-items: center;
 }
 
 .role-label {
   position: absolute;
+}
+
+/* 円形アイコン枠。サイズと gap は layout ごとに指定する（cast.css / cast-replay.css）。 */
+.cast-icon {
+  flex: none;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.cast-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* アイコンを除いた残りの領域で名前を中央寄せする。 */
+.cast-name {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
 }

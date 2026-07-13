@@ -2,6 +2,7 @@ import type { NodeCG } from './nodecg';
 import { loadTeamsPoolFromCsv, parseTeamsPoolFromCsvText } from './loadTeams';
 import { loadTeamsFromSheets } from './loadTeamsFromSheets';
 import { createWeaponImageMiddleware } from './serveWeaponImages';
+import { createCastIconMiddleware } from './serveCastIcons';
 import { loadCastCandidates } from './loadCastCandidates';
 import { castCandidatesSchema } from '../schemas';
 import type { Team } from '../schemas';
@@ -196,6 +197,9 @@ export default (nodecg: NodeCG) => {
 
   // GET /weapon-images/{id}.png
   nodecg.mount('/weapon-images', createWeaponImageMiddleware(log));
+
+  // GET /cast-icons/{キャスト名}
+  nodecg.mount('/cast-icons', createCastIconMiddleware(log));
 
   // OBS 等の外部トリガーから勝利数（本数）を操作するエンドポイント
   // POST /result  (body: { "result": "alpha_win" | "bravo_win" | "reset" }, Content-Type: application/json)

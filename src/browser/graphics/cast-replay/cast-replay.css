@@ -1,4 +1,4 @@
-/* cast-replay.html 専用配置 (画面やや左下に実況・解説、右側やや中央より下に配信・オブザーバー) */
+/* cast-replay.html 専用配置 (画面やや左下に実況・解説) */
 /* 細かい数値は後で手動調整してください */
 .cast-layout--replay .role--announcer {
   width: 215px;
@@ -14,30 +14,12 @@
   font-size: 60px;
 }
 
-.cast-layout--replay .role-label--operator {
-  width: 120px;
-  top: 552px;
-  right: 290px;
-  font-size: 40px;
+/* replay レイアウトのアイコンサイズ・余白（枠が狭いので小さめ。後で手動調整） */
+.cast-layout--replay .role {
+  gap: 12px;
 }
 
-.cast-layout--replay .role-label--observer {
-  width: 218px;
-  top: 624px;
-  right: 294px;
-  font-size: 40px;
-}
-
-.cast-layout--replay .role--operator {
-  width: 210px;
-  top: 552px;
-  right: 88px;
-  font-size: 50px;
-}
-
-.cast-layout--replay .role--observer {
-  width: 210px;
-  top: 625px;
-  right: 88px;
-  font-size: 50px;
+.cast-layout--replay .cast-icon {
+  width: 56px;
+  height: 56px;
 }
