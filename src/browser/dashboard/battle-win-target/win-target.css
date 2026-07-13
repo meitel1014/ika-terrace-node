@@ -1,0 +1,25 @@
+/* 必要勝利数パネル（BATTLE Workspace）。
+   ボタンの見た目は dashboard.css の .toggle-btn / .toggle-btn--on を流用する。 */
+
+.win-target-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.win-target-panel p {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.win-target-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.win-target-buttons .toggle-btn {
+  flex: 1;
+  padding: 10px 0;
+  font-size: 16px;
+}

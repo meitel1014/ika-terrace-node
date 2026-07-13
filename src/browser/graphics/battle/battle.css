@@ -50,12 +50,12 @@
    位置(margin-left)・幅(width)・フォントサイズは仮置き。微調整は手動で行う。 */
 .battle-win-count {
   position: absolute;
-  left: 241px;
-  top: 48%;
+  left: 256px;
+  top: 44%;
   transform: translateY(-50%);
   margin-left: 24px;
   width: 1.2em;
-  text-align: right;
+  text-align: center;
   letter-spacing: -0.1em;
   font-family: 'vdl-logomarujr-pop-futoline', sans-serif;
   font-size: 60px;
@@ -65,7 +65,7 @@
 /* 左下: アルファプレイヤー */
 .battle-alpha-players {
   position: absolute;
-  bottom: 7px;
+  bottom: 9px;
   left: 40px;
   display: flex;
   flex-direction: column;
@@ -76,7 +76,7 @@
 /* 右下: ブラボープレイヤー */
 .battle-bravo-players {
   position: absolute;
-  bottom: 7px;
+  bottom: 9px;
   right: 40px;
   display: flex;
   flex-direction: column;

@@ -13,6 +13,12 @@ export type { Selection } from './selection';
 export { winCountSchema } from './winCount';
 export type { WinCount } from './winCount';
 
+export { winTargetSchema } from './winTarget';
+export type { WinTarget } from './winTarget';
+
+export { championSchema } from './champion';
+export type { Champion } from './champion';
+
 export { castCandidatesSchema } from './castCandidates';
 export type { CastCandidates } from './castCandidates';
 

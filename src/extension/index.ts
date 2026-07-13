@@ -13,8 +13,31 @@ export default (nodecg: NodeCG) => {
   const teamsPoolRep = nodecg.Replicant('teamsPool');
   const selectionRep = nodecg.Replicant('selection');
   const winCountRep = nodecg.Replicant('winCount');
+  const winTargetRep = nodecg.Replicant('winTarget');
+  const championRep = nodecg.Replicant('champion');
   const castCandidatesRep = nodecg.Replicant('castCandidates');
   const castMembersRep = nodecg.Replicant('castMembers');
+
+  // 優勝サイド（champion）を winCount / winTarget から一元的に導出する。
+  // - 確定済みサイドが必要数を維持している間はそのまま（先着優先。BO3 で 2-2 等の異常系対策）。
+  // - 未確定 or 確定サイドが必要数を下回ったら、到達サイドを再判定（同時到達は alpha 優先）。
+  // selection 変更時は既存ロジックが該当枠の winCount を 0 にするため、その change を
+  // 通じてここが再発火し champion も自動的に解除される（selection ハンドラへの追記は不要）。
+  const recomputeChampion = () => {
+    const wc = winCountRep.value ?? { alpha: 0, bravo: 0 };
+    const target = winTargetRep.value ?? 2;
+    const cur = championRep.value?.side ?? null;
+    if (cur && wc[cur] >= target) return;
+    let next: 'alpha' | 'bravo' | null = null;
+    if (wc.alpha >= target) next = 'alpha';
+    else if (wc.bravo >= target) next = 'bravo';
+    if (next !== cur) {
+      championRep.value = { side: next };
+      log.info(`[champion] side=${next ?? 'none'} (winCount=${JSON.stringify(wc)}, target=${target})`);
+    }
+  };
+  winCountRep.on('change', recomputeChampion);
+  winTargetRep.on('change', recomputeChampion);
 
   // チーム選択が入れ替わったら、その枠の勝利数を 0 にリセットする。
   // Extension 側で一元化することで、Dashboard 経由でもプログラム経由でも確実にリセットされる。
