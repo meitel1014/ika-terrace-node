@@ -1,0 +1,62 @@
+/* CHAMPION グラフィック（1920×1080）。
+   優勝確定チームのチーム名＋プレイヤー4名（2x2）のみを文字で表示する。
+   フォントは battle と同じ 'vdl-v7marugothic' / font-weight:800。
+   背景は透明（OBS オーバーレイ用）。
+   配置・サイズは仮置き。微調整は手動で行う。 */
+
+.champion-container {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  font-family: 'vdl-v7marugothic', sans-serif;
+  font-weight: 800;
+  color: #000000;
+}
+
+/* 画面中央にチーム名＋プレイヤーを縦積み */
+.champion-content {
+  position: absolute;
+  top: 0px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 60px;
+  width: 1000px;
+}
+
+/* チーム名（FitText のルート div）。幅を超えたら自動縮小 */
+.champion-team-name {
+  position: absolute;
+  vertical-align: middle;
+  display: flex;
+  left: 460px;
+  top: 726px;
+  width: 550px;
+  height: 70px;
+  font-size: 50px;
+  line-height: 1.0;
+  text-align: center;
+  justify-content: center;
+}
+
+/* プレイヤー名 2x2 grid */
+.champion-players {
+  position: absolute;
+  align-items: center;
+  gap: 60px;
+  width: 950px;
+  top: 803px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 0px;
+  row-gap: 22px;
+  justify-items: center;
+}
+
+.champion-player {
+  font-size: 42px;
+  line-height: 1.0;
+  text-align: center;
+}

@@ -30,6 +30,13 @@
         "width": 8
       },
       {
+        "name": "battle-win-target",
+        "title": "必要勝利数",
+        "file": "battle-win-target.html",
+        "workspace": "Battle",
+        "width": 4
+      },
+      {
         "name": "settings-csv-reload",
         "title": "設定｜チーム情報再読込",
         "file": "settings-csv-reload.html",
@@ -59,6 +66,11 @@
       },
       {
         "file": "cast.html",
+        "width": 1920,
+        "height": 1080
+      },
+      {
+        "file": "champion.html",
         "width": 1920,
         "height": 1080
       },
