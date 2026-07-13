@@ -23,6 +23,7 @@
   width: 280px;
   height: 70px;
   font-size: 36px;
+  line-height: 1.0;
 }
 
 .battle-team-name-wrapper.team-alpha{
@@ -31,6 +32,10 @@
 
 .battle-team-name-wrapper.team-bravo{
   top: 78px;
+}
+
+.battle-team-name-wrapper small{
+  font-size: 20px;
 }
 
 /* FitText のルート div */
@@ -46,7 +51,7 @@
 .battle-win-count {
   position: absolute;
   left: 241px;
-  top: 56%;
+  top: 48%;
   transform: translateY(-50%);
   margin-left: 24px;
   width: 1.2em;

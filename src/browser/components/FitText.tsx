@@ -4,8 +4,8 @@ import { observeFitMeasure } from '../utils/observeFitMeasure';
 type Props = {
   /** レンダリングする生 HTML 文字列 */
   html: string;
-  /** transform-origin の水平位置。左寄せなら 'left'、右寄せなら 'right' */
-  align?: 'left' | 'right';
+  /** transform-origin の水平位置。左寄せなら 'left'、右寄せなら 'right'、中央寄せなら 'center' */
+  align?: 'left' | 'right' | 'center';
 } & Omit<HTMLAttributes<HTMLDivElement>, 'dangerouslySetInnerHTML' | 'children'>;
 
 /**
@@ -46,7 +46,7 @@ export function FitText({ html, align = 'left', style, ...rest }: Props) {
     });
   }, [html]);
 
-  const origin = align === 'right' ? 'right top' : 'left top';
+  const origin = align === 'right' ? 'right top' : align === 'center' ? 'center top' : 'left top';
 
   return (
     <div ref={containerRef} style={{ ...style }} {...rest}>
