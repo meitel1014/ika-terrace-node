@@ -4,7 +4,7 @@
   height: 1080px;
   font-family: 'vdl-v7marugothic', sans-serif;
   font-weight: 800;
-  color: #000000;
+  color: #101010;
 }
 
 /* 左上: チーム名ブロック */
@@ -70,7 +70,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 26px;
+  gap: 23px;
 }
 
 /* 右下: ブラボープレイヤー */
@@ -81,11 +81,11 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 26px;
+  gap: 23px;
 }
 
 .battle-player {
-  font-size: 28px;
+  font-size: 30px;
   line-height: 1.2;
 }
 
