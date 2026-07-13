@@ -27,7 +27,7 @@ export function TeamRosterGraphic({ side }: { side: Side }) {
       {team && (
         <>
           <div className="roster-team-name-box">
-            <FitText html={team.viewname} align="center" className="roster-team-name" />
+            <FitText html={team.viewname} align="left" className="roster-team-name" />
           </div>
           <div className="roster-players">
             {team.players.map((p, i) => (

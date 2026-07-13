@@ -10,8 +10,6 @@ type FieldKey = keyof CastMembers;
 const FIELDS: { key: FieldKey; label: string; candidatesKey: 'cast' | 'operator' | 'observer' }[] = [
   { key: 'announcer', label: '実況', candidatesKey: 'cast' },
   { key: 'commentator', label: '解説', candidatesKey: 'cast' },
-  { key: 'operator', label: '配信', candidatesKey: 'operator' },
-  { key: 'observer', label: 'オブザーバー', candidatesKey: 'observer' },
 ];
 
 function applyLabel(isDirty: boolean, status: Status): string {
