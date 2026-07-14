@@ -5,7 +5,8 @@
 | ファイル/ディレクトリ | 内容 |
 |---|---|
 | `teams.csv` | チーム情報原本（UTF-8 BOMなし）。スプレッドシート読み込み失敗時のフォールバック |
-| `cast.json` | 実況・解説担当者候補リスト |
+| `cast.json` | 実況・解説担当者候補リスト（`cast` / `operator` / `observer` 各配列。省略キーは空配列） |
+| `cast_icon/` | キャストアイコン画像（`{キャスト名}.{拡張子}`）。`/bundles/ika-terrace-node/cast-icons/{キャスト名}` で配信（拡張子を除いた basename 一致で検索） |
 | `sheets.json` | Googleスプレッドシート（申請フォーム/選手情報登録フォーム）の参照URL設定 |
 | `credentials/` | GCPサービスアカウントの鍵JSON配置先（配下の最初の `.json` を自動検出。中身は読み取り禁止） |
 | `weapon_aliases.csv` | 武器名（`ja`）↔ 画像ファイル名（`id`）の対応表 |
