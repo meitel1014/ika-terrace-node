@@ -2,8 +2,8 @@
 /* 細かい数値は後で手動調整してください */
 
 .cast-layout--main .role--announcer {
-  width: 600px;
-  height: 120px;
+  width: 580px;
+  height: 170px;
   bottom: 249px;
   transform: translateY(50%);
   left: 240px;
@@ -11,8 +11,8 @@
 }
 
 .cast-layout--main .role--commentator {
-  width: 600px;
-  height: 120px;
+  width: 580px;
+  height: 170px;
   bottom: 249px;
   transform: translateY(50%);
   left: 1080px;
@@ -21,7 +21,7 @@
 
 /* main レイアウトのアイコンサイズ・余白（後で手動調整） */
 .cast-layout--main .role {
-  gap: 0px;
+  gap: 20px;
 }
 
 .cast-layout--main .cast-icon {
