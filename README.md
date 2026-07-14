@@ -132,6 +132,38 @@ npx nodecg start
 | **チーム情報 CSV 再読込** ボタン | サーバー上の `data/teams.csv` を再読み込み。**編集内容はすべて破棄**されます |
 | **参照…** ボタン（ファイル選択） | ローカル PC から CSV ファイルを選択してアップロード。再読込と同じく、編集内容は上書きされます |
 
+## HTTP エンドポイント
+
+OBS の「ブラウザソース制御」や外部スクリプトなどから、HTTP リクエストで勝利数（本数）を操作するためのエンドポイントです。
+
+バンドル名を含むパスに公開されます。ホスト部は起動 PC の IP アドレスに読み替え可です。
+
+> [!IMPORTANT]
+> URL には `localhost` ではなく `127.0.0.1` を使ってください。Windows では `localhost` が IPv6（`::1`）を先に解決しようとして数秒〜十数秒の接続遅延が出ることがあります（OBS の Advanced Scene Switcher 等から叩く場合に顕著）。IPv4 を数値で直接指定することでこの遅延を回避できます。
+
+### `POST /result` — 勝利数の操作
+
+OBS 等の外部トリガーから、アルファ／ブラボーの本数を増減・リセットします。試合結果が確定すると `champion`（優勝サイド）も自動で導出されます。
+
+- **パス**: `http://127.0.0.1:9090/bundles/ika-terrace-node/result`
+- **Content-Type**: `application/json`
+- **ボディ**（JSON）: `{ "result": "alpha_win" | "bravo_win" | "reset" }`
+  - `alpha_win` / `bravo_win` … 該当サイドの勝利数 +1
+  - `reset` … 両サイドを 0 にリセット
+- **レスポンス**: 成功時 `202 Accepted`（ボディなし）。`result` が不正な場合は `400`。
+
+```powershell
+# アルファの勝利数を +1
+curl.exe -X POST http://127.0.0.1:9090/bundles/ika-terrace-node/result `
+  -H "Content-Type: application/json" `
+  -d '{\"result\":\"alpha_win\"}'
+
+# 本数をリセット
+curl.exe -X POST http://127.0.0.1:9090/bundles/ika-terrace-node/result `
+  -H "Content-Type: application/json" `
+  -d '{\"result\":\"reset\"}'
+```
+
 ## トラブルシューティング
 
 ### `pnpm` コマンドが見つからない
