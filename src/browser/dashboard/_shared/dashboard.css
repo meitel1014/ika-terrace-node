@@ -103,6 +103,7 @@ body {
   background: var(--bg-surface);
   color: var(--text);
   cursor: pointer;
+  user-select: none;
   transition: background 0.15s;
 }
 
