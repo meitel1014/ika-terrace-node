@@ -1,7 +1,9 @@
 /* team-roster-alpha / team-roster-bravo: 1920x1080 フルスクリーン、片チームのみ表示 */
 
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@800&family=Varela+Round&display=swap');
+
 :root {
-  font-family: 'vdl-v7marugothic', sans-serif;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
   font-weight: 800;
   color: #303030;
 }
@@ -21,11 +23,11 @@
 /* 位置決め＋上下左右中央寄せの外箱（固定位置・固定サイズ） */
 .roster-team-name-box {
   position: absolute;
-  top: 50px;
+  top: 60px;
   left: 50%;
   transform: translateX(-50%);
   width: 1000px;
-  height: 200px; /* 縦中央寄せの基準。名前欄の高さ。要調整 */
+  height: 190px; /* 縦中央寄せの基準。名前欄の高さ。要調整 */
   display: flex;
   align-items: center; /* 縦中央 */
   justify-content: center; /* 横中央 */
@@ -45,12 +47,12 @@
 
 .roster-players {
   position: absolute;
-  top: 312px;
+  top: 323px;
   left: 200px;
   width: 1650px;
   display: flex;
   flex-direction: column;
-  gap: 52px;
+  gap: 75px;
 }
 
 .roster-player {
