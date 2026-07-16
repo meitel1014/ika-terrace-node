@@ -1,0 +1,43 @@
+/* 試合段階パネル（Battle Workspace）。
+   フォームフィールド（.field / select）とボタン（.btn-sm）は dashboard.css を流用する。 */
+
+.match-stage-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.match-stage-panel p {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.match-stage-round {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.match-stage-round .btn-sm {
+  padding: 6px 14px;
+  font-size: 16px;
+  min-width: 44px;
+}
+
+.match-stage-round .btn-sm:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.match-stage-round-value {
+  font-size: 16px;
+  font-weight: 600;
+  min-width: 6em;
+  text-align: center;
+}
+
+.match-stage-round-value--disabled {
+  color: var(--text-muted);
+  opacity: 0.5;
+}

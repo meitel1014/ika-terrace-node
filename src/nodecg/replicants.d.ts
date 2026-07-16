@@ -1,4 +1,4 @@
-import type { TeamsPool, Selection, WinCount, WinTarget, Champion, CastCandidates, CastMembers } from '../schemas';
+import type { TeamsPool, Selection, WinCount, WinTarget, MatchStage, Champion, CastCandidates, CastMembers } from '../schemas';
 
 /**
  * すべてのReplicantの型を定義するマップ
@@ -8,6 +8,7 @@ export type ReplicantMap = {
   selection: Selection;
   winCount: WinCount;
   winTarget: WinTarget;
+  matchStage: MatchStage;
   champion: Champion;
   castCandidates: CastCandidates;
   castMembers: CastMembers;

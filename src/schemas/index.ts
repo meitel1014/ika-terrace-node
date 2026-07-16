@@ -16,6 +16,9 @@ export type { WinCount } from './winCount';
 export { winTargetSchema } from './winTarget';
 export type { WinTarget } from './winTarget';
 
+export { matchStageSchema } from './matchStage';
+export type { MatchStage } from './matchStage';
+
 export { championSchema } from './champion';
 export type { Champion } from './champion';
 

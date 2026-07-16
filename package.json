@@ -30,6 +30,13 @@
         "width": 8
       },
       {
+        "name": "battle-match-stage",
+        "title": "試合段階",
+        "file": "battle-match-stage.html",
+        "workspace": "Battle",
+        "width": 4
+      },
+      {
         "name": "settings-win-target",
         "title": "設定｜必要勝利数",
         "file": "settings-win-target.html",

@@ -7,6 +7,19 @@
   color: #101010;
 }
 
+/* 試合段階（第◯試合 / 準決勝 / 決勝）。
+   配置は手動調整用の仮置き。position:absolute のみ最小設定。 */
+.battle-match-stage {
+  position: absolute;
+  top: 62px;
+  left: 135px;
+  width: 250px;
+  height: 50px;
+  transform: translateY(-50%);
+  line-height: 50px;
+  font-size: 40px;
+}
+
 /* 左上: チーム名ブロック */
 .battle-team-names {
   position: absolute;

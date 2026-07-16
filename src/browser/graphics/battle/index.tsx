@@ -33,6 +33,17 @@ function TeamNames() {
   );
 }
 
+function MatchStageLabel() {
+  const [matchStage] = useReplicant('matchStage');
+  const stage = matchStage?.stage ?? 'preliminary';
+  const round = matchStage?.round ?? 1;
+
+  const text =
+    stage === 'semifinal' ? '準決勝' : stage === 'final' ? '決勝' : `予選 第${round}回戦`;
+
+  return <div className="battle-match-stage">{text}</div>;
+}
+
 function PlayersColumn({ side }: { side: Side }) {
   const { team } = useTeamData(side);
   const className = side === 'alpha' ? 'battle-alpha-players' : 'battle-bravo-players';
@@ -49,6 +60,7 @@ function PlayersColumn({ side }: { side: Side }) {
 function BattleGraphic() {
   return (
     <div className="battle-container">
+      <MatchStageLabel />
       <TeamNames />
       <PlayersColumn side="alpha" />
       <PlayersColumn side="bravo" />
