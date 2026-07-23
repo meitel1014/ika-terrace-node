@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import type { Rule } from '../../schemas';
+import { stripHtml } from '../../browser/utils/stripHtml';
 import { yieldToEventLoop } from './utils';
 
 const STAGES_BASE_DIR = path.resolve(process.cwd(), 'data/stages');
@@ -41,10 +42,22 @@ function readStageNames(rule: Rule, warn?: WarnLogger): string[] {
       starter?: unknown;
       counter?: unknown;
     };
-    const starter = Array.isArray(parsed.starter) ? (parsed.starter as string[]) : [];
-    const counter = Array.isArray(parsed.counter) ? (parsed.counter as string[]) : [];
+    // 各要素は "ステージ名"（文字列）または { name, label }。name を取り出し、
+    // 判別テンプレート（data/stages/<rule>/<name>.png）の検索キーとして
+    // HTML タグを除去したプレーン名にする。
+    const toName = (item: unknown): string => {
+      const raw =
+        typeof item === 'string'
+          ? item
+          : item && typeof item === 'object' && typeof (item as { name?: unknown }).name === 'string'
+            ? (item as { name: string }).name
+            : '';
+      return stripHtml(raw).trim();
+    };
+    const starter = Array.isArray(parsed.starter) ? parsed.starter.map(toName) : [];
+    const counter = Array.isArray(parsed.counter) ? parsed.counter.map(toName) : [];
     // 重複を除いた starter ∪ counter
-    return [...new Set([...starter, ...counter])].map((s) => String(s).trim()).filter(Boolean);
+    return [...new Set([...starter, ...counter])].filter(Boolean);
   } catch (e) {
     warn?.(`[matchStage] stages.json のパースに失敗しました: ${jsonPath}`, e);
     return [];

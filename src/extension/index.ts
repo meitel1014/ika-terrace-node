@@ -9,6 +9,7 @@ import { createCastIconMiddleware } from './serveCastIcons';
 import { createStageIconMiddleware } from './serveStageIcons';
 import { matchStage, loadStageTemplates, invalidateStageTemplates } from './ocr/matchStage';
 import { loadCastCandidates } from './loadCastCandidates';
+import { stripHtml } from '../browser/utils/stripHtml';
 import { castCandidatesSchema, stagePoolSchema } from '../schemas';
 import type { Team, Rule } from '../schemas';
 
@@ -97,19 +98,58 @@ export default (nodecg: NodeCG) => {
   const STAGES_BASE_DIR = path.resolve(process.cwd(), 'data/stages');
   const SCREENSHOT_DIR = path.resolve(process.cwd(), 'data/screenshots');
 
-  // data/stages/<rule>/stages.json（{ starter, counter }）を読み、stagePool に反映する。
+  // stages.json の各ステージは "ステージ名"（文字列）または { name, label } の形式を許可する。
+  // アイコン照合・判別テンプレートの検索キーは常に HTML タグを除去したプレーン名にし、
+  // 表示用ラベル（<br> 等を含みうる）は labels に分けて持つ。
+  const parseStageList = (
+    list: unknown,
+  ): { names: string[]; labels: Record<string, string> } => {
+    const names: string[] = [];
+    const labels: Record<string, string> = {};
+    const add = (rawName: string, label?: unknown) => {
+      const key = stripHtml(rawName).trim(); // 検索キーはタグ除去済みのプレーン名
+      if (!key) return;
+      names.push(key);
+      if (typeof label === 'string' && label.trim()) {
+        labels[key] = label;
+      } else if (rawName.trim() !== key) {
+        // name 自体に HTML（<br> 等）が含まれる場合は、表示用に生の name を残す
+        labels[key] = rawName;
+      }
+    };
+    if (Array.isArray(list)) {
+      for (const item of list) {
+        if (typeof item === 'string') add(item);
+        else if (item && typeof item === 'object' && typeof (item as { name?: unknown }).name === 'string') {
+          add((item as { name: string }).name, (item as { label?: unknown }).label);
+        }
+      }
+    }
+    return { names, labels };
+  };
+
+  // data/stages/<rule>/stages.json を読み、stagePool に反映する。
   // 読み込めない場合は空プールにする。
   const loadStagePool = (rule: Rule) => {
     const jsonPath = path.join(STAGES_BASE_DIR, rule, 'stages.json');
     try {
-      const parsed = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
-      stagePoolRep.value = stagePoolSchema.parse(parsed);
+      const parsed = JSON.parse(fs.readFileSync(jsonPath, 'utf-8')) as {
+        starter?: unknown;
+        counter?: unknown;
+      };
+      const starter = parseStageList(parsed.starter);
+      const counter = parseStageList(parsed.counter);
+      stagePoolRep.value = stagePoolSchema.parse({
+        starter: starter.names,
+        counter: counter.names,
+        labels: { ...starter.labels, ...counter.labels },
+      });
       log.info(
-        `[stagePool] rule=${rule} starter=${stagePoolRep.value.starter.length} counter=${stagePoolRep.value.counter.length}`
+        `[stagePool] rule=${rule} starter=${stagePoolRep.value.starter.length} counter=${stagePoolRep.value.counter.length} labels=${Object.keys(stagePoolRep.value.labels).length}`
       );
     } catch (e) {
       log.warn(`[stagePool] ${jsonPath} 読み込み失敗（空プールにします）`, e);
-      stagePoolRep.value = { starter: [], counter: [] };
+      stagePoolRep.value = { starter: [], counter: [], labels: {} };
     }
   };
 

@@ -1,4 +1,5 @@
 import { useReplicant } from '../../hooks/useReplicant';
+import { stripHtml } from '@/browser/utils/stripHtml';
 import type { StageBanpick, MatchStage } from '@/schemas';
 
 const DEFAULT_BP: StageBanpick = { history: [], banned: [], picked: null, phase: 'pick' };
@@ -8,7 +9,7 @@ const MAX_BAN = 2;
 // パネル用の小さめステージアイコン（data/stages/icon）を配信する /stage-thumbs のURL。
 // nodecg.mount() はバンドル名プレフィックスされないため素のパスを返す。
 function stageThumbUrl(name: string): string {
-  return `/stage-thumbs/${encodeURIComponent(name)}`;
+  return `/stage-thumbs/${encodeURIComponent(stripHtml(name))}`;
 }
 
 // ステージアイコン + 左下に小さめの名前 + 下部の黒グラデーションを描くタイル。
@@ -82,11 +83,22 @@ export function StageBanpickPanel() {
 
   const selectPick = (name: string) => {
     if (usedSet.has(name) || bp.banned.includes(name)) return;
-    setStageBanpick({ ...bp, picked: name });
+    // 選択済みのステージを再クリックしたら選択解除する。
+    setStageBanpick({ ...bp, picked: bp.picked === name ? null : name });
   };
 
   const confirmBan = () => setStageBanpick({ ...bp, phase: 'pick' });
-  const confirmPick = () => setStageBanpick({ ...bp, phase: 'confirmed' });
+
+  const confirmPick = () => {
+    if (!bp.picked) return;
+    // 1試合目はおまかせで確定段階が不要なため、確定と同時に次の試合の BAN へ直行する。
+    // （BO1 など次の試合が無い場合は従来どおり確定表示にする）
+    if (isGame1 && !isLastGame) {
+      setStageBanpick({ history: [...bp.history, bp.picked], banned: [], picked: null, phase: 'ban' });
+    } else {
+      setStageBanpick({ ...bp, phase: 'confirmed' });
+    }
+  };
 
   // 次の試合へ: 確定したステージを history に積み、BAN フェーズで次試合を開始。
   // BO の最大試合数（winTarget）に達している場合は進めない。
@@ -117,13 +129,15 @@ export function StageBanpickPanel() {
     } else if (bp.phase === 'pick' && !isGame1) {
       setStageBanpick({ ...bp, phase: 'ban', picked: null });
     } else if (bp.phase === 'ban' && bp.history.length > 0) {
-      // 直前の試合の確定状態へ巻き戻す。
+      // 直前の試合へ巻き戻す。1試合目には確定段階が無いので pick に戻し、
+      // それ以外は確定表示（confirmed）に戻す。
       const prev = bp.history[bp.history.length - 1];
+      const newHistory = bp.history.slice(0, -1);
       setStageBanpick({
-        history: bp.history.slice(0, -1),
+        history: newHistory,
         banned: [],
         picked: prev,
-        phase: 'confirmed',
+        phase: newHistory.length === 0 ? 'pick' : 'confirmed',
       });
     }
   };
@@ -231,7 +245,7 @@ export function StageBanpickPanel() {
         )}
         {bp.phase === 'pick' && (
           <button className="btn" disabled={!bp.picked} onClick={confirmPick}>
-            確定（PICK）
+            {isGame1 ? '確定' : '確定（PICK）'}
           </button>
         )}
         {bp.phase === 'confirmed' && (
