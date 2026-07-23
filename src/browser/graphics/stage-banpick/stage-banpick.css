@@ -1,0 +1,95 @@
+/* ステージバンピック Graphic（1920×1080、中央下寄せ） */
+
+.banpick-container {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+}
+
+/* スターター行＋カウンター行を縦に並べ、画面中央下に配置 */
+.banpick-rows {
+  position: absolute;
+  left: 50%;
+  bottom: 72px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+.banpick-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 28px;
+}
+
+/* 各ステージセル。角を少し丸め、overflow:hidden でアイコンをクリップ */
+.stage-cell {
+  position: relative;
+  width: 260px;
+  height: 146px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 4px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  background: #111;
+  transition: filter 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.stage-cell__icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* BAN 用の × マーク */
+.stage-cell__ban-mark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 96px;
+  font-weight: 900;
+  line-height: 1;
+  color: #ff3b3b;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+/* ── 状態別スタイル ───────────────────────── */
+
+/* 通常: そのまま */
+.stage-cell--normal {
+  border-color: rgba(255, 255, 255, 0.85);
+}
+
+/* PICK: 金の強調枠 */
+.stage-cell--pick {
+  border-color: #ffd447;
+  box-shadow: 0 0 0 4px rgba(255, 212, 71, 0.55), 0 0 28px 6px rgba(255, 212, 71, 0.85);
+  transform: scale(1.06);
+}
+
+/* BAN: 暗転（× マークは別要素で重ねる） */
+.stage-cell--ban {
+  filter: brightness(0.4) saturate(0.6);
+  border-color: rgba(255, 59, 59, 0.75);
+}
+
+/* 使用済み: グレースケール＋減光 */
+.stage-cell--used {
+  filter: grayscale(1) brightness(0.6);
+  border-color: rgba(150, 150, 150, 0.7);
+}
+
+/* 1試合目のカウンター等、プール外の非アクティブ表示 */
+.stage-cell--inactive {
+  filter: grayscale(0.85) brightness(0.55);
+  opacity: 0.85;
+  border-color: rgba(120, 120, 120, 0.6);
+}

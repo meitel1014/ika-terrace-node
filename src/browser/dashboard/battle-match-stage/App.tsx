@@ -12,17 +12,19 @@ const DEFAULT: MatchStage = { stage: 'preliminary', round: 1 };
 
 export function MatchStagePanel() {
   const [matchStage, setMatchStage] = useReplicant('matchStage');
+  const [regulationRounds] = useReplicant('regulationRounds');
   const current = matchStage ?? DEFAULT; // 初回未到達時は既定値を表示
 
   const isPreliminary = current.stage === 'preliminary';
+  const maxRound = regulationRounds ?? 3; // 予選の規定回戦数を上限とする
 
   const setStage = (stage: MatchStage['stage']) => {
     setMatchStage({ ...current, stage });
   };
 
-  // 試合番号は 1 始まり。予選選択時のみ操作可能。
+  // 試合番号は 1 始まり・規定回戦数が上限。予選選択時のみ操作可能。
   const setRound = (round: number) => {
-    setMatchStage({ ...current, round: Math.max(1, round) });
+    setMatchStage({ ...current, round: Math.min(maxRound, Math.max(1, round)) });
   };
 
   return (
@@ -45,7 +47,7 @@ export function MatchStagePanel() {
       </div>
 
       <div className="field">
-        <label>試合番号（予選のみ）</label>
+        <label>試合番号（予選のみ・最大 第{maxRound}回戦）</label>
         <div className="match-stage-round">
           <button
             className="btn-sm"
@@ -59,7 +61,7 @@ export function MatchStagePanel() {
           </span>
           <button
             className="btn-sm"
-            disabled={!isPreliminary}
+            disabled={!isPreliminary || current.round >= maxRound}
             onClick={() => setRound(current.round + 1)}
           >
             ＋

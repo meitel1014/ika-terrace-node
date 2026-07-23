@@ -37,6 +37,13 @@
         "width": 4
       },
       {
+        "name": "battle-stage-banpick",
+        "title": "ステージバンピック",
+        "file": "battle-stage-banpick.html",
+        "workspace": "Battle",
+        "width": 8
+      },
+      {
         "name": "settings-win-target",
         "title": "設定｜必要勝利数",
         "file": "settings-win-target.html",
@@ -54,6 +61,20 @@
         "name": "settings-cast-upload",
         "title": "設定｜担当者リスト読込",
         "file": "settings-cast-upload.html",
+        "workspace": "設定",
+        "width": 4
+      },
+      {
+        "name": "settings-stage-rule",
+        "title": "設定｜バンピック ルール",
+        "file": "settings-stage-rule.html",
+        "workspace": "設定",
+        "width": 4
+      },
+      {
+        "name": "settings-regulation-rounds",
+        "title": "設定｜予選 規定回戦数",
+        "file": "settings-regulation-rounds.html",
         "workspace": "設定",
         "width": 4
       },
@@ -95,6 +116,11 @@
         "file": "team-roster-bravo.html",
         "width": 1920,
         "height": 1080
+      },
+      {
+        "file": "stage-banpick.html",
+        "width": 1920,
+        "height": 1080
       }
     ]
   },
@@ -108,6 +134,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "rollup": "^4.53.3",
+    "sharp": "^0.34.5",
     "rollup-plugin-esbuild": "^6.2.1",
     "rollup-plugin-node-externals": "^8.1.2",
     "zod": "^3.23.8"

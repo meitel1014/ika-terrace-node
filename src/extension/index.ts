@@ -1,11 +1,16 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import sharp from 'sharp';
 import type { NodeCG } from './nodecg';
 import { loadTeamsPoolFromCsv, parseTeamsPoolFromCsvText } from './loadTeams';
 import { loadTeamsFromSheets } from './loadTeamsFromSheets';
 import { createWeaponImageMiddleware } from './serveWeaponImages';
 import { createCastIconMiddleware } from './serveCastIcons';
+import { createStageIconMiddleware } from './serveStageIcons';
+import { matchStage, loadStageTemplates, invalidateStageTemplates } from './ocr/matchStage';
 import { loadCastCandidates } from './loadCastCandidates';
-import { castCandidatesSchema } from '../schemas';
-import type { Team } from '../schemas';
+import { castCandidatesSchema, stagePoolSchema } from '../schemas';
+import type { Team, Rule } from '../schemas';
 
 export default (nodecg: NodeCG) => {
   const log = new nodecg.Logger('ikaterrace');
@@ -18,6 +23,9 @@ export default (nodecg: NodeCG) => {
   const championRep = nodecg.Replicant('champion');
   const castCandidatesRep = nodecg.Replicant('castCandidates');
   const castMembersRep = nodecg.Replicant('castMembers');
+  const stageRuleRep = nodecg.Replicant('stageRule');
+  const stagePoolRep = nodecg.Replicant('stagePool');
+  const detectedStageRep = nodecg.Replicant('detectedStage');
 
   // 優勝サイド（champion）を winCount / winTarget から一元的に導出する。
   // - 確定済みサイドが必要数を維持している間はそのまま（先着優先。BO3 で 2-2 等の異常系対策）。
@@ -83,6 +91,39 @@ export default (nodecg: NodeCG) => {
     `operator=${castCandidatesRep.value?.operator.length ?? 0}, ` +
     `observer=${castCandidatesRep.value?.observer.length ?? 0}`
   );
+
+  // ── ステージバンピック ───────────────────────────────────
+
+  const STAGES_BASE_DIR = path.resolve(process.cwd(), 'data/stages');
+  const SCREENSHOT_DIR = path.resolve(process.cwd(), 'data/screenshots');
+
+  // data/stages/<rule>/stages.json（{ starter, counter }）を読み、stagePool に反映する。
+  // 読み込めない場合は空プールにする。
+  const loadStagePool = (rule: Rule) => {
+    const jsonPath = path.join(STAGES_BASE_DIR, rule, 'stages.json');
+    try {
+      const parsed = JSON.parse(fs.readFileSync(jsonPath, 'utf-8'));
+      stagePoolRep.value = stagePoolSchema.parse(parsed);
+      log.info(
+        `[stagePool] rule=${rule} starter=${stagePoolRep.value.starter.length} counter=${stagePoolRep.value.counter.length}`
+      );
+    } catch (e) {
+      log.warn(`[stagePool] ${jsonPath} 読み込み失敗（空プールにします）`, e);
+      stagePoolRep.value = { starter: [], counter: [] };
+    }
+  };
+
+  // 起動時: 現ルールのプールを導出し、判別テンプレートを事前ロードする。
+  loadStagePool(stageRuleRep.value ?? 'splatZones');
+  void loadStageTemplates(stageRuleRep.value ?? 'splatZones', log.warn.bind(log));
+
+  // ルール変更時: プールを再導出し、テンプレートキャッシュを破棄して再ロードする。
+  stageRuleRep.on('change', (newRule, oldRule) => {
+    if (!newRule || newRule === oldRule) return;
+    loadStagePool(newRule);
+    invalidateStageTemplates(newRule);
+    void loadStageTemplates(newRule, log.warn.bind(log));
+  });
 
   // POST /upload-teams-csv  (body: UTF-8 CSV text, Content-Type: text/plain)
   const MAX_CSV_BYTES = 1 * 1024 * 1024; // 1 MB: チーム情報CSVとして十分な上限
@@ -200,6 +241,100 @@ export default (nodecg: NodeCG) => {
 
   // GET /cast-icons/{キャスト名}
   nodecg.mount('/cast-icons', createCastIconMiddleware(log));
+
+  // GET /stage-icons/{ステージ名}  … 高解像度アイコン（data/stage_icon、Graphic 用）
+  nodecg.mount('/stage-icons', createStageIconMiddleware(log));
+
+  // GET /stage-thumbs/{ステージ名} … 小さめアイコン（data/stages/icon、Dashboard パネル用）
+  nodecg.mount(
+    '/stage-thumbs',
+    createStageIconMiddleware(log, path.resolve(process.cwd(), 'data/stages/icon')),
+  );
+
+  // POST /stage  (body: <raw base64 PNG>, Content-Type: text/plain)
+  // OBS 等が試合開始画面のスクリーンショットを base64 で送信する。
+  // 現ルールのテンプレートと ZNCC マッチングし、最良候補を detectedStage Replicant に書く。
+  const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10MB: base64 PNG として 1920×1080 以上をカバー
+
+  nodecg.mount('/stage', (req, res) => {
+    if (req.method !== 'POST') {
+      res.status(405).end();
+      return;
+    }
+
+    const rule: Rule = stageRuleRep.value ?? 'splatZones';
+    let totalBytes = 0;
+    let oversized = false;
+    const chunks: Buffer[] = [];
+
+    req.on('data', (chunk: Buffer) => {
+      totalBytes += chunk.length;
+      if (totalBytes > MAX_IMAGE_BYTES) {
+        if (!oversized) {
+          oversized = true;
+          res.status(413).json({ error: 'payload too large' });
+          req.destroy();
+        }
+        return;
+      }
+      chunks.push(chunk);
+    });
+
+    req.on('end', () => {
+      if (oversized) return;
+
+      const base64 = Buffer.concat(chunks).toString('utf-8').trim();
+      if (!base64) {
+        res.status(400).json({ error: 'empty body' });
+        return;
+      }
+
+      let imageBuf: Buffer;
+      try {
+        imageBuf = Buffer.from(base64, 'base64');
+      } catch {
+        res.status(400).json({ error: 'invalid base64' });
+        return;
+      }
+
+      const filename = `stage-${Date.now()}.png`;
+      const filePath = path.join(SCREENSHOT_DIR, filename);
+      try {
+        fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
+        fs.writeFileSync(filePath, imageBuf);
+      } catch (e) {
+        log.error('[stage] スクリーンショット保存失敗', e);
+        res.status(500).json({ error: 'save failed' });
+        return;
+      }
+
+      // 判別は非同期。レスポンスは受理を先に返す。
+      res.status(202).json({ accepted: true });
+
+      void (async () => {
+        try {
+          const meta = await sharp(filePath).metadata();
+          const w = meta.width ?? 1920;
+          const h = meta.height ?? 1080;
+          const ranked = await matchStage(filePath, rule, w, h, log.warn.bind(log));
+          if (ranked.length > 0) {
+            detectedStageRep.value = { stageName: ranked[0].stageName, score: ranked[0].score };
+            log.info(
+              `[stage] best="${ranked[0].stageName}" score=${(ranked[0].score * 100).toFixed(1)}% (rule=${rule})`
+            );
+          } else {
+            log.warn(`[stage] テンプレートが見つかりません (rule=${rule})`);
+          }
+        } catch (e) {
+          log.error(`[stage] 判別失敗: ${filename}`, e);
+        }
+      })();
+    });
+
+    req.on('error', (e) => {
+      log.error('[stage] リクエストエラー', e);
+    });
+  });
 
   // OBS 等の外部トリガーから勝利数（本数）を操作するエンドポイント
   // POST /result  (body: { "result": "alpha_win" | "bravo_win" | "reset" }, Content-Type: application/json)

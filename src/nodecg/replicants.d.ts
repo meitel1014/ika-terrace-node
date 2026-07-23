@@ -1,4 +1,4 @@
-import type { TeamsPool, Selection, WinCount, WinTarget, MatchStage, Champion, CastCandidates, CastMembers } from '../schemas';
+import type { TeamsPool, Selection, WinCount, WinTarget, MatchStage, Champion, CastCandidates, CastMembers, StageRule, StagePool, StageBanpick, DetectedStage, RegulationRounds } from '../schemas';
 
 /**
  * すべてのReplicantの型を定義するマップ
@@ -12,4 +12,9 @@ export type ReplicantMap = {
   champion: Champion;
   castCandidates: CastCandidates;
   castMembers: CastMembers;
+  stageRule: StageRule;
+  stagePool: StagePool;
+  stageBanpick: StageBanpick;
+  detectedStage: DetectedStage;
+  regulationRounds: RegulationRounds;
 };

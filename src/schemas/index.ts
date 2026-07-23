@@ -19,6 +19,24 @@ export type { WinTarget } from './winTarget';
 export { matchStageSchema } from './matchStage';
 export type { MatchStage } from './matchStage';
 
+// rule は Replicant ではないため型のみ re-export（schemas/rule.json は生成しない）
+export type { Rule } from './rule';
+
+export { stageRuleSchema } from './stageRule';
+export type { StageRule } from './stageRule';
+
+export { stagePoolSchema } from './stagePool';
+export type { StagePool } from './stagePool';
+
+export { stageBanpickSchema } from './stageBanpick';
+export type { StageBanpick } from './stageBanpick';
+
+export { detectedStageSchema } from './detectedStage';
+export type { DetectedStage } from './detectedStage';
+
+export { regulationRoundsSchema } from './regulationRounds';
+export type { RegulationRounds } from './regulationRounds';
+
 export { championSchema } from './champion';
 export type { Champion } from './champion';
 

@@ -5,3 +5,5 @@ onlyBuiltDependencies:
   - better-sqlite3
   - esbuild
   - msgpackr-extract
+  - puppeteer
+  - sharp

@@ -1,0 +1,26 @@
+/* ルール選択パネル（設定 Workspace）。
+   ボタンの見た目は dashboard.css の .toggle-btn / .toggle-btn--on を流用する。 */
+
+.stage-rule-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stage-rule-panel p {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.stage-rule-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stage-rule-buttons .toggle-btn {
+  flex: 1 1 auto;
+  padding: 10px 12px;
+  font-size: 15px;
+}

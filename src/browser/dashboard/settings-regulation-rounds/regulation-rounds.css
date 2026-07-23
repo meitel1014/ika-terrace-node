@@ -1,0 +1,26 @@
+/* 予選 規定回戦数パネル（設定 Workspace）。 */
+
+.regulation-rounds-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.regulation-rounds-panel p {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.regulation-rounds-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.regulation-rounds-value {
+  min-width: 72px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+}

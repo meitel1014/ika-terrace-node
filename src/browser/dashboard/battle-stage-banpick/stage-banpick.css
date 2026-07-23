@@ -1,0 +1,251 @@
+/* ステージバンピック操作パネル（Battle Workspace）。 */
+
+.banpick-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.banpick-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.banpick-game {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.banpick-phase {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* 自動判別候補 */
+.banpick-detect {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* ステージ選択グリッド */
+.banpick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 6px;
+}
+
+/* ステージアイコンタイル（選択ボタン・確定・履歴で共通） */
+.stage-btn {
+  position: relative;
+  height: 66px;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, filter 0.15s, opacity 0.15s, transform 0.15s;
+}
+
+.stage-btn:hover:not(:disabled) {
+  border-color: #6b83b8;
+}
+
+.stage-btn:disabled {
+  cursor: not-allowed;
+}
+
+.stage-btn__icon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* アイコン下側の黒グラデーション（名前を見やすくする） */
+.stage-btn__grad {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 60%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0));
+  pointer-events: none;
+}
+
+/* 画像内左下に小さめのステージ名 */
+.stage-btn__name {
+  position: absolute;
+  left: 5px;
+  bottom: 3px;
+  right: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  text-align: left;
+  pointer-events: none;
+}
+
+/* 使用済み: グレーアウト */
+.stage-btn--used {
+  filter: grayscale(1) brightness(0.5);
+  opacity: 0.6;
+}
+
+/* 1試合目のカウンター（通常プール外・手動選択のみ）: 控えめに */
+.stage-btn--offpool {
+  opacity: 0.7;
+  border-style: dashed;
+}
+
+/* BAN: 赤枠 + 赤オーバーレイ + × マーク */
+.stage-btn--ban {
+  border-color: var(--accent-danger);
+}
+
+.stage-btn--ban::after {
+  content: '✕';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  font-weight: 900;
+  color: #ff5b5b;
+  background: rgba(239, 68, 68, 0.28);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+/* PICK: 金枠強調 */
+.stage-btn--pick {
+  border-color: #ffd447;
+  box-shadow: 0 0 0 2px rgba(255, 212, 71, 0.5), 0 0 12px rgba(255, 212, 71, 0.6);
+}
+
+/* 確定表示 */
+.banpick-confirmed {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background: rgba(255, 212, 71, 0.1);
+  border: 1px solid #ffd447;
+  border-radius: var(--radius);
+}
+
+.banpick-confirmed-label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* 枠内: 左にアイコン + 右にステージ名テキスト */
+.banpick-confirmed-body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.banpick-confirmed-icon {
+  width: 80px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.banpick-confirmed-stage {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffd447;
+}
+
+.banpick-actions .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 戻る / リセット系 */
+.banpick-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.banpick-footer .btn-sm:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-next-match {
+  margin-left: auto;
+  border-color: var(--accent-danger);
+  color: var(--accent-danger);
+}
+
+/* ── このマッチのバンピック履歴 ─────────────────────────── */
+.banpick-history {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.banpick-history-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.banpick-history-empty {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.banpick-history-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.history-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.history-item__tile {
+  width: 96px;
+  height: 54px;
+  cursor: default;
+}
+
+.history-item__tile .stage-btn__name {
+  font-size: 10px;
+}
+
+.history-item__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
